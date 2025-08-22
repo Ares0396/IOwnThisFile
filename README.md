@@ -51,7 +51,8 @@ Self-contained: just download, run, and protect your files.
 
 ## 🛠 Development Notes
 
-- Written in **C#** with **WinForms**  
+- Written in **C#** with **WinForms**
+- Uses **.NET 8**
 - Encryption: **AES-GCM**  
 - Executable is **self-contained**, no extra installations needed
 

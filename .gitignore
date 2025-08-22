@@ -1,0 +1,45 @@
+# Build results
+bin/
+obj/
+out/
+
+# Visual Studio Code settings
+.vscode/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Logs
+*.log
+
+# Debug / release files
+*.pdb
+*.cache
+*.ilk
+*.tmp
+
+# Compiled binaries
+*.dll
+*.exe
+*.app
+*.apk
+*.so
+*.dylib
+*.lib
+
+# Publish output
+publish/
+bin/Publish/
+
+# NuGet packages
+*.nupkg
+*.snupkg
+*.nuspec
+packages/
+
+# Others
+Thumbs.db
+Desktop.ini

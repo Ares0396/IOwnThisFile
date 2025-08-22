@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows10.0.22000.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <StartupObject></StartupObject>
+    <Company>AUP Group - Ares0396, Urast2379, Phuoc2024</Company>
+    <Product>IOwnThisFile</Product>
+    <Copyright>Copyright 2025 (C)</Copyright>
+    <SignAssembly>False</SignAssembly>
+    <PackageId>IOwnThisFile</PackageId>
+    <Title>A fine software using AES-GCM and IO-Lock for file protection.</Title>
+    <Authors>IOwnThisFile</Authors>
+    <Description>A fine software using AES-GCM and IO-Lock for file protection.</Description>
+    <PackageProjectUrl>https://github.com/Ares0396</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Ares0396/IOwnThisFile</RepositoryUrl>
+    <AssemblyName>IOwnThisFile</AssemblyName>
+  </PropertyGroup>
+
+</Project>

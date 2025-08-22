@@ -1,0 +1,7 @@
+C:\Users\Ares Crist\OneDrive\Project\Coding\IOwnThisFile\Main\bin\Publish\Main.pdb
+C:\Users\Ares Crist\OneDrive\Project\Coding\IOwnThisFile\Main\bin\Publish\D3DCompiler_47_cor3.dll
+C:\Users\Ares Crist\OneDrive\Project\Coding\IOwnThisFile\Main\bin\Publish\PenImc_cor3.dll
+C:\Users\Ares Crist\OneDrive\Project\Coding\IOwnThisFile\Main\bin\Publish\PresentationNative_cor3.dll
+C:\Users\Ares Crist\OneDrive\Project\Coding\IOwnThisFile\Main\bin\Publish\vcruntime140_cor3.dll
+C:\Users\Ares Crist\OneDrive\Project\Coding\IOwnThisFile\Main\bin\Publish\wpfgfx_cor3.dll
+C:\Users\Ares Crist\OneDrive\Project\Coding\IOwnThisFile\Main\bin\Publish\Main.exe

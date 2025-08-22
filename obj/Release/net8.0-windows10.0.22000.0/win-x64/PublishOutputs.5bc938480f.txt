@@ -1,0 +1,7 @@
+C:\Users\Ares Crist\OneDrive\Storage Data\Finished Projects\Coding\IOwnThisFile\IOwnThisFile.pdb
+C:\Users\Ares Crist\OneDrive\Storage Data\Finished Projects\Coding\IOwnThisFile\D3DCompiler_47_cor3.dll
+C:\Users\Ares Crist\OneDrive\Storage Data\Finished Projects\Coding\IOwnThisFile\PenImc_cor3.dll
+C:\Users\Ares Crist\OneDrive\Storage Data\Finished Projects\Coding\IOwnThisFile\PresentationNative_cor3.dll
+C:\Users\Ares Crist\OneDrive\Storage Data\Finished Projects\Coding\IOwnThisFile\vcruntime140_cor3.dll
+C:\Users\Ares Crist\OneDrive\Storage Data\Finished Projects\Coding\IOwnThisFile\wpfgfx_cor3.dll
+C:\Users\Ares Crist\OneDrive\Storage Data\Finished Projects\Coding\IOwnThisFile\IOwnThisFile.exe

@@ -16,7 +16,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCopyrightAttribute("Copyright 2025 (C)")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute("A fine software using AES-GCM and IO-Lock for file protection.")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e6edaa181f048d9b6bb6ce116ce83af808a8dbec")]
 [assembly: System.Reflection.AssemblyProductAttribute("IOwnThisFile")]
 [assembly: System.Reflection.AssemblyTitleAttribute("IOwnThisFile")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

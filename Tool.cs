@@ -1,5 +1,6 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Main
 {
@@ -52,7 +53,14 @@ namespace Main
                 ms.Write(AAD, 0, AAD.Length);
                 ms.Write(encryptedData, 0, encryptedData.Length);
                 ms.Write(tag, 0, tag.Length);
-                
+
+                //Clean up
+                CryptographicOperations.ZeroMemory(data); // Clear the original data from memory
+                CryptographicOperations.ZeroMemory(encryptedData); // Clear the encrypted data from memory
+                CryptographicOperations.ZeroMemory(keyBytes); // Clear the key bytes from memory
+                CryptographicOperations.ZeroMemory(AAD); // Clear the AAD from memory
+                CryptographicOperations.ZeroMemory(tag); // Clear the tag from memory
+
                 return ms.ToArray();
             }
         }
@@ -69,6 +77,7 @@ namespace Main
                 byte[] salt;
                 byte[] tag;
                 byte[] Ciphertext;
+                byte[] decryptedData;
 
                 using (MemoryStream ms_AAD = new())
                 {
@@ -108,10 +117,17 @@ namespace Main
 
                 using (AesGcm AES = new(keyBytes, Config.TagSize))
                 {
-                    byte[] decryptedData = new byte[Ciphertext.Length];
+                    decryptedData = new byte[Ciphertext.Length];
                     AES.Decrypt(nonce, Ciphertext, tag, decryptedData, AAD);
                     ms.Write(decryptedData, 0, decryptedData.Length);
                 }
+
+                //Clean up
+                CryptographicOperations.ZeroMemory(decryptedData); // Clear the decrypted data from memory
+                CryptographicOperations.ZeroMemory(encryptedData); // Clear the encrypted data from memory
+                CryptographicOperations.ZeroMemory(keyBytes); // Clear the key bytes from memory
+                CryptographicOperations.ZeroMemory(AAD); // Clear the AAD from memory
+                CryptographicOperations.ZeroMemory(tag); // Clear the tag from memory
 
                 return ms.ToArray();
             }

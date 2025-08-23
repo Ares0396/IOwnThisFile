@@ -1,0 +1,10 @@
+﻿v1.0:
+- First release of the application.
+- See README.md for initial setup instructions and usages.
+- Check out https://github.com/Ares0396/IOwnTHisFile for source code and contributions.
+v1.1:
+- Fixed a bug where the application would crash if the View Property button was enabled but no file on the File Management tab was present.
+- Improved the exiting process to ensure all resources are properly released.
+- Fixed a bug where the application would erase all items in the File Management tab when the user decrypted files, some of which are irrelevant to the list.
+- Added cleanup process after encryption and decryption, including removing temporary operation configs and clearing all traces of cryptographic operations in the memory.
+- Improved the IO-Locked date and time so that users can see the exact time when the file was locked, even if it's not locked anymore.

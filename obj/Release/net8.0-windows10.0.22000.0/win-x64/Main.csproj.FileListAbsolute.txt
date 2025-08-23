@@ -478,3 +478,4 @@ C:\Users\Ares Crist\OneDrive\Project\Coding\IOwnThisFile\Main\obj\Release\net8.0
 C:\Users\Ares Crist\OneDrive\Project\Coding\IOwnThisFile\Main\obj\Release\net8.0-windows10.0.22000.0\win-x64\refint\IOwnThisFile.dll
 C:\Users\Ares Crist\OneDrive\Project\Coding\IOwnThisFile\Main\obj\Release\net8.0-windows10.0.22000.0\win-x64\IOwnThisFile.pdb
 C:\Users\Ares Crist\OneDrive\Project\Coding\IOwnThisFile\Main\obj\Release\net8.0-windows10.0.22000.0\win-x64\ref\IOwnThisFile.dll
+C:\Users\Ares Crist\OneDrive\Project\Coding\IOwnThisFile\Main\obj\Release\net8.0-windows10.0.22000.0\win-x64\Main.sourcelink.json

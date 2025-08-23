@@ -132,7 +132,10 @@ namespace Main
                     }
                 }
 
-                
+                //Clean up
+                Config.SelectedFiles.Clear();
+                Config.Password = string.Empty;
+                Config.CryptoMode = Config.CryptographyMode.Encrypt; // Reset the mode to Encrypt for future operations
             });
         }
 
@@ -156,6 +159,8 @@ namespace Main
                     Config.LockStream_Dictionary.Clear();
                     Config.SelectedFiles.Clear();
                     Config.Password = string.Empty;
+                    Config.Property_FileLastLockstreamed.Clear();
+                    Config.Property_FileLastEncrypted.Clear();
                 }
                 catch (Exception ex)
                 {
@@ -269,11 +274,10 @@ namespace Main
                 var cryptographyForm = new CryptographyForm();
                 cryptographyForm.ShowDialog(); //Transfer control to the CryptographyForm for processing
 
-                //Clean up the list in the File Management tab
-                Invoke(new Action(() =>
-                {
-                    EncFile_List.Items.Clear();
-                }));
+                //Clean up
+                Config.SelectedFiles.Clear();
+                Config.Password = string.Empty;
+                Config.CryptoMode = Config.CryptographyMode.Encrypt; // Reset the mode to Encrypt for future operations
             });
         }
 
@@ -298,7 +302,7 @@ namespace Main
 
         private void EncFile_List_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (EncFile_List.SelectedItems.Count == 1)
+            if (EncFile_List.SelectedItems.Count == 1 & EncFile_List.Items.Count > 0) //Ensures no buggy behavior when no items present while one is selected (possibly null)
             {
                 Btn_ViewProperties.Enabled = true;
                 ToolTip_Btn_ViewProperties.Active = false;
@@ -395,7 +399,6 @@ namespace Main
                     lockStream.Dispose();
                     lockStream.Close();
                     Config.LockStream_Dictionary.Remove(file);
-                    Config.Property_FileLastLockstreamed.Remove(file); // Remove the lock time
 
                     Invoke(new Action(() =>
                     {

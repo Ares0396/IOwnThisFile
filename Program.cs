@@ -12,6 +12,7 @@ namespace Main
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
             Application.Run(new MainForm());
+            //I don't have enough time now, so I'll leave it for Wednesday to implement Checking for updates.
         }
     }
 }

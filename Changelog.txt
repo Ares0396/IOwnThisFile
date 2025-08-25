@@ -17,3 +17,8 @@ v1.0.2:
 - Fixed a bug where the application would not delete the once-IO-Locked file in the File Management tab after it was decrypted.
 - Increased iteration count to 500 000 so AES-GCM indirectly becomes more secure than ever (via key reinforcement).
 - Optimized internal UI handling.
+v1.1.0:
+- Added a new feature: Check for updates.
+   + The application will now check for updates on startup by default and notify the user if a new version is available.
+   + Users can choose to download the latest version directly from the notification.
+   + Users can also choose not to receive any more update notifications in the settings.

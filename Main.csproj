@@ -18,6 +18,17 @@
     <PackageProjectUrl>https://github.com/Ares0396</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Ares0396/IOwnThisFile</RepositoryUrl>
     <AssemblyName>IOwnThisFile</AssemblyName>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Version>1.0.2</Version>
+    <FileVersion>1.0.2</FileVersion>
+    <AssemblyVersion>1.0.2</AssemblyVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>

@@ -390,7 +390,7 @@
             Margin = new Padding(2);
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "IOwnThisFile 1.0";
+            Text = "IOwnThisFile 1.0.2";
             FormClosing += MainForm_FormClosing;
             Tab_Decryption.ResumeLayout(false);
             Tab_Decryption.PerformLayout();

@@ -135,12 +135,8 @@ namespace Main
         {
             if (e.Index < 0) return;
 
-#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
-            string itemText = CryptList.Items[e.Index].ToString();
-#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
+            string itemText = CryptList.Items[e.Index].ToString()!;
             Color textColor = itemText.Contains("(Error: Decryption failed)") ? Color.Red : Color.Black;
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
 
             e.DrawBackground();
             using (Brush brush = new SolidBrush(textColor))

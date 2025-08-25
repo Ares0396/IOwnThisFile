@@ -7,7 +7,7 @@ namespace Main
         public static Dictionary<string, FileStream> LockStream_Dictionary { get; set; } = [];
         public static string AAD_Header { get; set; } = "IOTF v1.0";
         public static int TagSize = 16;
-        public static int Iteration = 100000;
+        public static int Iteration = 500000;
         public static HashAlgorithmName RFC_Algorithm = HashAlgorithmName.SHA256;
         public static int SaltCount = 24;
         public static int NonceCount = 12;

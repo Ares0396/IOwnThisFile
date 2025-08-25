@@ -257,7 +257,7 @@ namespace Main
                     }
 
                     //Update the File Management tab
-                    if (EncFile_List.Items.Contains(file))
+                    if (EncFile_List.Items.Contains(file) || EncFile_List.Items.Contains(file + " (IO-Locked)")) //Bug: File is locked, but not in the listbox
                     {
                         Invoke(new Action(() =>
                         {
@@ -285,12 +285,8 @@ namespace Main
         {
             if (e.Index < 0) return;
 
-#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
-            string itemText = EncFile_List.Items[e.Index].ToString();
-#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
+            string itemText = EncFile_List.Items[e.Index].ToString()!;
             Color textColor = itemText.Contains("(IO-Locked)") ? Color.Green : Color.Black;
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
 
             e.DrawBackground();
             using (Brush brush = new SolidBrush(textColor))
@@ -625,28 +621,17 @@ namespace Main
             //So we don't need to check it here
 
             //Filter the "IO-Locked" suffix from the selected item
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
-            string selectedItem = EncFile_List.SelectedItem.ToString();
-#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
+            string selectedItem = EncFile_List.SelectedItem!.ToString()!;
             if (selectedItem.Contains("(IO-Locked)"))
             {
                 selectedItem = selectedItem.Replace(" (IO-Locked)", "");
             }
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
 
             //Set configs, and then open PropertyForm
-#pragma warning disable CS8602
-#pragma warning disable CS8601
             Config.Property_FilePath = selectedItem;
-            Config.Property_FileIsLocked = EncFile_List.SelectedItem.ToString().Contains("(IO-Locked)");
-#pragma warning restore CS8601
-#pragma warning restore CS8602
+            Config.Property_FileIsLocked = EncFile_List.SelectedItem.ToString()!.Contains("(IO-Locked)");
 
             //Check if the file is locked. If locked, then unleash temporarily. After we have the information, we will lock it again.
-#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
             if (Config.LockStream_Dictionary.TryGetValue(Config.Property_FilePath, out FileStream? lockStream))
             {
                 try

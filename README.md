@@ -12,8 +12,8 @@ Self-contained: just download, run, and protect your files.
 
 ## 🆕 Latest Release
 
-- **Version:** v1.0  
-- **Published:** August 22, 2025  
+- **Version:** v1.0.2  
+- **Published:** August 25, 2025  
 - **Download:** [Release page](https://github.com/Ares0396/IOwnThisFile/releases)  
 
 > No installation required beyond running the executable. Just double-click to start.
@@ -26,6 +26,14 @@ Self-contained: just download, run, and protect your files.
 - **Self-contained**: works on Windows 10+ with no extra dependencies  
 - Easy-to-use GUI  
 - Safe: does **not** collect or transmit any user data  
+
+---
+
+## 📄 Changelog
+
+- Fixed a bug where the application would not delete the once-IO-Locked file in the File Management tab after it was decrypted.
+- Increased iteration count to 500 000 so AES-GCM indirectly becomes more secure than ever (via key reinforcement).
+- Optimized internal UI handling.
 
 ---
 
@@ -55,6 +63,7 @@ Self-contained: just download, run, and protect your files.
 - Uses **.NET 8**
 - Encryption: **AES-GCM**  
 - Executable is **self-contained**, no extra installations needed
+- Source code available on [GitHub](
 
 ---
 

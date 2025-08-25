@@ -1,10 +1,19 @@
-﻿v1.0:
+﻿v1.0.0:
 - First release of the application.
 - See README.md for initial setup instructions and usages.
 - Check out https://github.com/Ares0396/IOwnTHisFile for source code and contributions.
-v1.1:
+- Features include file encryption and decryption using AES-GCM, file management, and viewing file properties.
+   + AES-GCM is chosen with PBKDF2 key derivation for its balance of security and performance.
+   + File management allows users to add, remove, and manage files they want to encrypt or decrypt.
+   + Viewing file properties provides insights into basic file information and encryption status.
+   + Secure deletion of files to prevent data recovery, including overwriting file data with random junk before deletion.
+v1.0.1:
 - Fixed a bug where the application would crash if the View Property button was enabled but no file on the File Management tab was present.
 - Improved the exiting process to ensure all resources are properly released.
 - Fixed a bug where the application would erase all items in the File Management tab when the user decrypted files, some of which are irrelevant to the list.
 - Added cleanup process after encryption and decryption, including removing temporary operation configs and clearing all traces of cryptographic operations in the memory.
 - Improved the IO-Locked date and time so that users can see the exact time when the file was locked, even if it's not locked anymore.
+v1.0.2:
+- Fixed a bug where the application would not delete the once-IO-Locked file in the File Management tab after it was decrypted.
+- Increased iteration count to 500 000 so AES-GCM indirectly becomes more secure than ever (via key reinforcement).
+- Optimized internal UI handling.

@@ -1,8 +1,7 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace Main
+namespace Main.Support_Tools
 {
     public class Tool
     {
@@ -55,11 +54,20 @@ namespace Main
                 ms.Write(tag, 0, tag.Length);
 
                 //Clean up
-                CryptographicOperations.ZeroMemory(data); // Clear the original data from memory
+                CryptographicOperations.ZeroMemory(data); // Clear the data from memory
                 CryptographicOperations.ZeroMemory(encryptedData); // Clear the encrypted data from memory
                 CryptographicOperations.ZeroMemory(keyBytes); // Clear the key bytes from memory
+                CryptographicOperations.ZeroMemory(userKeyBytes); // Clear the user key bytes from memory
                 CryptographicOperations.ZeroMemory(AAD); // Clear the AAD from memory
                 CryptographicOperations.ZeroMemory(tag); // Clear the tag from memory
+
+                userKeyBytes = null!;
+                keyBytes = null!;
+                encryptedData = null!;
+                AAD = null!;
+                tag = null!;
+                salt = null!;
+                data = null!;
 
                 return ms.ToArray();
             }
@@ -79,36 +87,21 @@ namespace Main
                 byte[] Ciphertext;
                 byte[] decryptedData;
 
-                using (MemoryStream ms_AAD = new())
+                AAD = encryptedData[..Config.AAD_Length];
+                header = encryptedData[..Config.AAD_Header.Length];
+                nonce = encryptedData[Config.AAD_Header.Length..(Config.AAD_Header.Length + Config.NonceCount)];
+                salt = encryptedData[(Config.AAD_Header.Length + Config.NonceCount)..(Config.AAD_Header.Length + Config.NonceCount + Config.SaltCount)];
+                Ciphertext = encryptedData[Config.AAD_Length..^Config.TagSize];
+                tag = encryptedData[^Config.TagSize..];
+
+                //Check header to ensure it's valid and locally encrypted
+                string headerString = Encoding.UTF8.GetString(header);
+                if (headerString != Config.AAD_Header)
                 {
-                    ms_AAD.Write(encryptedData, 0, Config.AAD_Length);
-                    AAD = ms_AAD.ToArray();
+                    return decryptedData = []; // Invalid header, return empty array
+                    throw new InvalidOperationException(); // Throw an exception so that CryptoOperationSucceeded is set to false
                 }
-                using (MemoryStream ms_Header = new())
-                {
-                    ms_Header.Write(encryptedData, 0, Config.AAD_Header.Length);
-                    header = ms_Header.ToArray();
-                }
-                using (MemoryStream ms_Nonce = new())
-                {
-                    ms_Nonce.Write(encryptedData, Config.AAD_Header.Length, Config.NonceCount);
-                    nonce = ms_Nonce.ToArray();
-                }
-                using (MemoryStream ms_Salt = new())
-                {
-                    ms_Salt.Write(encryptedData, Config.AAD_Header.Length + Config.NonceCount, Config.SaltCount);
-                    salt = ms_Salt.ToArray();
-                }
-                using (MemoryStream ms_Ciphertext = new())
-                {
-                    ms_Ciphertext.Write(encryptedData, Config.AAD_Length, encryptedData.Length - Config.AAD_Length - Config.TagSize);
-                    Ciphertext = ms_Ciphertext.ToArray();
-                }
-                using (MemoryStream ms_Tag = new())
-                {
-                    ms_Tag.Write(encryptedData, encryptedData.Length - Config.TagSize, Config.TagSize);
-                    tag = ms_Tag.ToArray();
-                }
+
 
                 using (Rfc2898DeriveBytes RFC = new(userKeyBytes, salt, Config.Iteration, Config.RFC_Algorithm))
                 {
@@ -128,6 +121,15 @@ namespace Main
                 CryptographicOperations.ZeroMemory(keyBytes); // Clear the key bytes from memory
                 CryptographicOperations.ZeroMemory(AAD); // Clear the AAD from memory
                 CryptographicOperations.ZeroMemory(tag); // Clear the tag from memory
+
+                userKeyBytes = null!;
+                keyBytes = null!;
+                encryptedData = null!;
+                AAD = null!;
+                tag = null!;
+                salt = null!;
+                Ciphertext = null!;
+                decryptedData = null!;
 
                 return ms.ToArray();
             }
@@ -163,7 +165,7 @@ namespace Main
         public static void WriteDataByChunk(byte[] data, Stream output, int chunkSize = 8192)
         {
             //Check
-            if (output == null) throw new ArgumentNullException(nameof(output));
+            ArgumentNullException.ThrowIfNull(output);
             if (!output.CanWrite) throw new ArgumentException("Stream must be writable.", nameof(output));
 
             //Define variables
@@ -178,6 +180,27 @@ namespace Main
                 output.Write(buffer, 0, bytesToWrite);
                 offset += bytesToWrite;
             }
+        }
+        public static string HashContent(byte[] buffer, HashAlgorithm hasher)
+        {
+            byte[] localHash = hasher.ComputeHash(buffer);
+            string stringHash = BitConverter.ToString(localHash).Replace("-", "").ToLowerInvariant();
+            return stringHash;
+        }
+        public static string ConvertRawBytes(long size)
+        {
+            string[] sizes = { "Bytes", "KB", "MB", "GB", "TB", "PB", "EB" };
+            double len = size;
+            int order = 0;
+
+            while (len >= 1024 && order < sizes.Length - 1)
+            {
+                order++;
+                len = len / 1024;
+            }
+
+            // Format with 3 decimal places
+            return $"{len:0.###} {sizes[order]}";
         }
     }
 }

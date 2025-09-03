@@ -12,8 +12,8 @@ Self-contained: just download, run, and protect your files.
 
 ## 🆕 Latest Release
 
-- **Version:** v1.0.2  
-- **Published:** August 25, 2025  
+- **Version:** v1.1.0
+- **Published:** September 3, 2025  
 - **Download:** [Release page](https://github.com/Ares0396/IOwnThisFile/releases)  
 
 > No installation required beyond running the executable. Just double-click to start.
@@ -31,9 +31,18 @@ Self-contained: just download, run, and protect your files.
 
 ## 📄 Changelog
 
-- Fixed a bug where the application would not delete the once-IO-Locked file in the File Management tab after it was decrypted.
-- Increased iteration count to 500 000 so AES-GCM indirectly becomes more secure than ever (via key reinforcement).
-- Optimized internal UI handling.
+- Added a new feature: Check for updates.
+   + The application will now check for updates on startup by default and notify the user if a new version is available.
+   + Users can choose to download the latest version directly from the notification.
+   + Users can also choose not to receive any more update notifications in the settings.
+   + While updating, users can cancel the update.
+- Added a new feature: Setting & Preference.
+   + Save settings to registry or file (default is registry)
+   + White/black theme (default is white)
+   + Auto-check for updates on startup (default is enabled)
+- Improved byte unit handling: Everyone can see the file size in KB, MB, GB, etc, without having to peer their eyes at a large number in "byte" unit.
+- Enhanced cryptographic operations: Multi-thread operations are now supported, meaning that your files are protected more quickly.
+- Fixed a decryption bug: The app now does not accept AES-GCM-encrypted files that were not previously encrypted by the app itself
 
 ---
 
@@ -44,6 +53,7 @@ Self-contained: just download, run, and protect your files.
 3. Select a file to encrypt or decrypt.  
 4. Enter your password/key.  
 5. Click **Encrypt** or **Decrypt**.  
+6. Manage your protected files in **File Management** tab.
 
 > ⚠️ Always test with **dummy files** first to confirm everything works as expected.
 
@@ -63,7 +73,7 @@ Self-contained: just download, run, and protect your files.
 - Uses **.NET 8**
 - Encryption: **AES-GCM**  
 - Executable is **self-contained**, no extra installations needed
-- Source code available on [GitHub](
+- Source code available on Github
 
 ---
 

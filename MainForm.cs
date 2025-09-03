@@ -1,11 +1,18 @@
 
+using Main.Support_Tools;
+
 namespace Main
 {
     public partial class MainForm : Form
     {
-        public MainForm()
+        private AppSetting appSetting;
+        public MainForm(AppSetting appSetting)
         {
             InitializeComponent();
+            this.appSetting = appSetting;
+
+            //Apply settings from appSetting to the UI elements
+            ApplySettings(appSetting);
         }
 
         private async void Btn_AddFiles_Enc_Click(object sender, EventArgs e)
@@ -90,7 +97,7 @@ namespace Main
                 Config.Password = TxtBox_Pass_Enc.Text;
                 Config.CryptoMode = Config.CryptographyMode.Encrypt; // Set the mode to Encrypt
 
-                var cryptographyForm = new CryptographyForm();
+                var cryptographyForm = new CryptographyForm(appSetting);
                 cryptographyForm.ShowDialog(); //Transfer control to the CryptographyForm for processing
 
                 //LockStream here, if ChkBox_IOLock.Checked is true
@@ -271,7 +278,7 @@ namespace Main
                 Config.Password = TxtBox_Pass_Dec.Text;
                 Config.CryptoMode = Config.CryptographyMode.Decrypt; // Set the mode to Decrypt
 
-                var cryptographyForm = new CryptographyForm();
+                var cryptographyForm = new CryptographyForm(appSetting);
                 cryptographyForm.ShowDialog(); //Transfer control to the CryptographyForm for processing
 
                 //Clean up
@@ -658,6 +665,236 @@ namespace Main
             //Open the PropertyForm
             PropertyForm propertyForm = new();
             propertyForm.ShowDialog();
+        }
+
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+
+        }
+        private void LkLb_ImportSettingFile_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            Dlg_OpenFiles_Setting.ShowDialog(); //Get the setting file
+            AppSetting importedSettings = AppSetting.LoadSettings(Dlg_OpenFiles_Setting.FileName); //Import settings
+
+            try
+            {
+                ApplySettings(importedSettings); //Apply settings to the UI elements
+            }
+            catch
+            {
+                MessageBox.Show("Failed to apply the imported settings. The file may be corrupted or incompatible.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+        }
+
+        private void ChkBox_SettingReg_CheckedChanged(object sender, EventArgs e)
+        {
+            //Since we can only have one settings storage method, we need to uncheck the other checkbox
+            if (ChkBox_SettingReg.Checked)
+            {
+                ChkBox_SettingFile.Checked = false;
+            }
+            else { }
+            Config.SettingsChanged = true; //Mark that settings have changed
+            SetLb_SaveSettingStatus(false); //Mark that settings have changed and need to be saved
+        }
+        private void ChkBox_SettingFile_CheckedChanged(object sender, EventArgs e)
+        {
+            //Since we can only have one settings storage method, we need to uncheck the other checkbox
+            if (ChkBox_SettingFile.Checked)
+            {
+                ChkBox_SettingReg.Checked = false;
+            }
+            else { }
+            Config.SettingsChanged = true; //Mark that settings have changed
+            SetLb_SaveSettingStatus(false); //Mark that settings have changed and need to be saved
+        }
+        private void Btn_SaveSetting_Click(object sender, EventArgs e)
+        {
+            if (!Config.SettingsChanged) //If settings are saved already, do nothing
+            {
+                return;
+            }
+
+            //Determine which saving method to use
+            if (ChkBox_SettingFile.Checked)
+            {
+                if (appSetting.App_SettingSaveMode_FilePath == string.Empty || !File.Exists(appSetting.App_SettingSaveMode_FilePath)) Dlg_SaveFiles_Setting.ShowDialog();
+                if (Dlg_SaveFiles_Setting.FileName == string.Empty)
+                {
+                    //User cancelled the save dialog
+                    SetLb_SaveSettingStatus(false);
+                }
+                appSetting.App_SettingSaveMode_FilePath = Dlg_SaveFiles_Setting.FileName; //Set the file path
+                appSetting.App_SettingSaveMode = AppSetting.InternalSettingSaveMode.File; //Set the saving method
+                AppSetting.SaveSettingsFile(appSetting, Dlg_SaveFiles_Setting.FileName); //Save settings to file
+
+                //Save file path to registry here
+                AppSetting.SaveSettingsRegistry(new AppSetting() { App_SettingSaveMode_FilePath = Dlg_SaveFiles_Setting.FileName, App_SettingSaveMode = AppSetting.InternalSettingSaveMode.File });
+
+                SetLb_SaveSettingStatus(true);
+                Config.SettingsChanged = false; //Mark that settings have been saved
+            }
+            else if (ChkBox_SettingReg.Checked)
+            {
+                appSetting.App_SettingSaveMode = AppSetting.InternalSettingSaveMode.Registry; //Set the saving method
+                AppSetting.SaveSettingsRegistry(appSetting); //Save settings to registry
+                SetLb_SaveSettingStatus(true);
+                Config.SettingsChanged = false; //Mark that settings have been saved
+            }
+            else
+            {
+                SetLb_SaveSettingStatus(false);
+                MessageBox.Show("Please select a settings storage method before saving settings.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+        }
+        private void ChkBox_AllOutWriteMode_CheckedChanged_1(object sender, EventArgs e)
+        {
+            if (ChkBox_AllOutWriteMode.Checked)
+            {
+                if (MessageBox.Show("All-Out Write Mode is a potentially dangerous mode that may slow your computer. Are you sure you want to continue?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+                {
+                    appSetting.SmartWriteSelector_AllOutMode = true; //Enable All-Out Write Mode (TODO)
+                    NumUpDown_NumParallelProcessing.Enabled = false; //Disable Parallel Processing Number Thread selection (TODO)
+                    return;
+                }
+                ChkBox_AllOutWriteMode.Checked = false;
+            }
+            else
+            {
+                //Disable All-Out Write Mode (TODO)
+                appSetting.SmartWriteSelector_AllOutMode = false;
+
+                //Enable Parallel Processing Number Thread selection (TODO)
+                NumUpDown_NumParallelProcessing.Enabled = true;
+            }
+            Config.SettingsChanged = true; //Mark that settings have changed
+            SetLb_SaveSettingStatus(false); //Mark that settings have changed and need to be saved
+        }
+        private void ChkBox_CheckUpdate_CheckedChanged(object sender, EventArgs e)
+        {
+            if (ChkBox_CheckUpdate.Checked)
+            {
+                //Enable Retry Count selection
+                NumUpDown_UpdateAttemptCount.Enabled = true;
+                appSetting.UpdateChecker_AutoCheck = true;
+            }
+            else
+            {
+                //Disable Retry Count selection
+                NumUpDown_UpdateAttemptCount.Enabled = false;
+                appSetting.UpdateChecker_AutoCheck = false;
+            }
+            Config.SettingsChanged = true; //Mark that settings have changed
+            SetLb_SaveSettingStatus(false); //Mark that settings have changed and need to be saved
+        }
+        private void CbBox_Theme_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (CbBox_Theme.SelectedItem == null) return; //Ensures no buggy behavior when no item is selected (possibly null)
+            if (CbBox_Theme.SelectedItem.ToString() == "Light")
+            {
+                appSetting.App_Theme = AppSetting.InternalTheme.Light;
+                SetTheme(AppSetting.InternalTheme.Light);
+            }
+            else if (CbBox_Theme.SelectedItem.ToString() == "Dark")
+            {
+                appSetting.App_Theme = AppSetting.InternalTheme.Dark;
+                SetTheme(AppSetting.InternalTheme.Dark);
+            }
+            else
+            {
+                //Should never reach here
+                MessageBox.Show("An unexpected error occurred while changing the theme. Please try again.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            Config.SettingsChanged = true; //Mark that settings have changed
+            SetLb_SaveSettingStatus(false); //Mark that settings have changed and need to be saved
+        }
+
+        private void ApplySettings(AppSetting appSetting)
+        {
+            //Saving mode
+            if (appSetting.App_SettingSaveMode == AppSetting.InternalSettingSaveMode.File)
+            {
+                ChkBox_SettingFile.Checked = true;
+            }
+            else if (appSetting.App_SettingSaveMode == AppSetting.InternalSettingSaveMode.Registry)
+            {
+                ChkBox_SettingReg.Checked = true;
+            }
+
+            //Check update
+            if (appSetting.UpdateChecker_AutoCheck)
+            {
+                ChkBox_CheckUpdate.Checked = true;
+            }
+            else
+            {
+                ChkBox_CheckUpdate.Checked = false;
+            }
+
+            //Update attempt count
+            NumUpDown_UpdateAttemptCount.Value = appSetting.UpdateChecker_RetryMaxCount;
+
+            //Theme
+            if (appSetting.App_Theme == AppSetting.InternalTheme.Light)
+            {
+                CbBox_Theme.SelectedIndex = 0; //Light
+                SetTheme(AppSetting.InternalTheme.Light);
+            }
+            else if (appSetting.App_Theme == AppSetting.InternalTheme.Dark)
+            {
+                CbBox_Theme.SelectedIndex = 1; //Dark
+                SetTheme(AppSetting.InternalTheme.Dark);
+
+            }
+
+            //Smart Write Selector Threshold
+            NumUpDown_NumParallelProcessing.Value = appSetting.SmartWriteSelector_Threshold;
+
+            //All-Out Write Mode
+            if (appSetting.SmartWriteSelector_AllOutMode)
+            {
+                ChkBox_AllOutWriteMode.Checked = true;
+            }
+            else
+            {
+                ChkBox_AllOutWriteMode.Checked = false;
+            }
+        }
+        private void SetTheme(AppSetting.InternalTheme theme)
+        {
+            AppSetting.SetTheme(this, theme);
+        }
+        private void SetLb_SaveSettingStatus(bool settingSaved)
+        {
+            if (settingSaved)
+            {
+                Lb_SaveSettingStatus.Text = "Settings saved successfully.";
+                Lb_SaveSettingStatus.Location = new Point(490, 51);
+                Lb_SaveSettingStatus.ForeColor = Color.LimeGreen;
+            }
+            else
+            {
+                Lb_SaveSettingStatus.Text = "Be careful! You haven't saved your settings yet!";
+                Lb_SaveSettingStatus.Location = new Point(384, 53);
+                Lb_SaveSettingStatus.ForeColor = Color.Red;
+            }
+        }
+
+        private void NumUpDown_NumParallelProcessing_ValueChanged(object sender, EventArgs e)
+        {
+            appSetting.SmartWriteSelector_Threshold = (int)NumUpDown_NumParallelProcessing.Value;
+            Config.SettingsChanged = true;
+            SetLb_SaveSettingStatus(false);
+        }
+
+        private void NumUpDown_UpdateAttemptCount_ValueChanged(object sender, EventArgs e)
+        {
+            appSetting.UpdateChecker_RetryMaxCount = (int)NumUpDown_UpdateAttemptCount.Value;
+            SetLb_SaveSettingStatus(false);
+            Config.SettingsChanged = true;
         }
     }
 }

@@ -22,3 +22,11 @@ v1.1.0:
    + The application will now check for updates on startup by default and notify the user if a new version is available.
    + Users can choose to download the latest version directly from the notification.
    + Users can also choose not to receive any more update notifications in the settings.
+   + While updating, users can cancel the update.
+- Added a new feature: Setting & Preference.
+   + Save settings to registry or file (default is registry)
+   + White/black theme (default is white)
+   + Auto-check for updates on startup (default is enabled)
+- Improved byte unit handling: Everyone can see the file size in KB, MB, GB, etc, without having to peer their eyes at a large number in "byte" unit.
+- Enhanced cryptographic operations: Multi-thread operations are now supported, meaning that your files are protected more quickly.
+- Fixed a decryption bug: The app now does not accept AES-GCM-encrypted files that were not previously encrypted by the app itself

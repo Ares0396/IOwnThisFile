@@ -1,4 +1,6 @@
 ﻿
+using Main.Support_Tools;
+
 namespace Main
 {
     public partial class PropertyForm : Form
@@ -13,14 +15,18 @@ namespace Main
             //We have the check installed in MainForm.cs, so we can assume that FilePath is set.
             string FilePath = Config.Property_FilePath;
 
-            //Get file information
-            FileInfo fileInfo = new FileInfo(FilePath);
-            string fileName = fileInfo.Name;
-            long fileSize = fileInfo.Length;
-            bool isLocked = Config.Property_FileIsLocked;
+            //Get file information and define placeholders
+            FileInfo fileInfo = new(FilePath);
+            string fileName = fileInfo.Name; //File name
+            long fileSize = fileInfo.Length; //File size
+            bool isLocked = Config.Property_FileIsLocked; //IO-Locked flag
             DateTime lastEncrypted = Config.Property_FileLastEncrypted.TryGetValue(FilePath, out DateTime value)
                 ? value : DateTime.MinValue;
             string lastLockedText;
+            string lastEncryptedText;
+            string fileSizeText = Tool.ConvertRawBytes(fileSize);
+
+            //Customize and refine the display text
             if (isLocked)
             {
                 lastLockedText = Config.Property_FileLastLockstreamed.TryGetValue(FilePath, out DateTime lockTime)
@@ -31,16 +37,19 @@ namespace Main
                 FileStream lockStream = Tool.InitializeLockStream(FilePath);
                 Config.LockStream_Dictionary.Add(FilePath, lockStream);
             }
-            else
+            else lastLockedText = "Last time IO-Locked: " + "File is not locked.";
+            if (lastEncrypted ==  DateTime.MinValue)
             {
-                lastLockedText = "Last time IO-Locked: " + "File is not locked.";
+                //Unknown encryption time,
+                lastEncryptedText = "File is encrypted but no encryption time recorded.";
             }
+            else lastEncryptedText = lastEncrypted.ToString();
 
             //Set the properties in the form
             Lb_FileName.Text = "Name of the file: " + fileName;
-            Lb_FileSize.Text = "File size: " + fileSize.ToString() + " bytes"; //In newer versions, consider converting to KB, MB, etc.
+            Lb_FileSize.Text = "File size: " + fileSizeText; //In newer versions, consider converting to KB, MB, etc.
             Lb_LockStream.Text = "File is locked: " + (isLocked ? "True" : "False");
-            Lb_LastEncrypted.Text = "Last time encrypted: " + lastEncrypted.ToString();
+            Lb_LastEncrypted.Text = "Last time encrypted: " + lastEncryptedText;
             Lb_LastLockstreamed.Text = lastLockedText;
         }
     }

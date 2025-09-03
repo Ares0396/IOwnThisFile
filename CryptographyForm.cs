@@ -1,149 +1,123 @@
-﻿
+﻿using Main.Support_Tools;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Windows.Forms;
+
 namespace Main
 {
     public partial class CryptographyForm : Form
     {
-        public CryptographyForm()
+        public AppSetting appSetting;
+        public CryptographyForm(AppSetting appSetting)
         {
             InitializeComponent();
+            this.appSetting = appSetting;
         }
 
         private async void CryptographyForm_Load(object sender, EventArgs e)
         {
-            // Reset the flag before starting any operation
             Config.CryptographicOperationSucceeded = true;
 
-            Focus();
-            BringToFront();
+            ApplyUserTheme();
 
-            List<string> SelectedFiles = Config.SelectedFiles;
+            var selectedFiles = new List<string>(Config.SelectedFiles);
+            selectedFiles.RemoveAll(f => !File.Exists(f));
 
-            for (int i = SelectedFiles.Count - 1; i >= 0; i--)
+            if (selectedFiles.Count == 0)
             {
-                if (!File.Exists(SelectedFiles[i]))
-                {
-                    MessageBox.Show($"File not found: {SelectedFiles[i]}. This file will be skipped.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    SelectedFiles.RemoveAt(i);
-                    continue;
-                }
-                else continue;
-            }
-            if (SelectedFiles.Count == 0)
-            {
-                MessageBox.Show("No valid files selected for processing.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("No valid files selected.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Close();
                 return;
             }
 
-            await Task.Run(async () =>
+            // Setup Progress<T> for UI updates
+            var generalProgress = new Progress<(string file, bool success)>(update =>
             {
-                if (Config.CryptoMode == Config.CryptographyMode.Encrypt)
-                {
-                    Invoke(new Action(() =>
-                    {
-                        Lb_Status.Text = "Status: Encrypting files... Please do not close this window until encryption has been completed.";
-                    }));
-                    foreach (string file in SelectedFiles)
-                    {
-                        Invoke(new Action(() =>
-                        {
-                            Lb_FileProcessing.Text = "Processing file: " + file;
-                        }));
-                        string pass = Config.Password;
-                        byte[] data = File.ReadAllBytes(file);
-                        byte[] encryptedData = Tool.EncryptData(data, pass);
-
-                        File.WriteAllBytes(file, encryptedData);
-                        Invoke(new Action(() =>
-                        {
-                            CryptList.Items.Add(file);
-                        }));
-                        await Task.Delay(1); // Simulate some delay for UI update
-                    }
-                }
-                else if (Config.CryptoMode == Config.CryptographyMode.Decrypt)
-                {
-                    Invoke(new Action(() =>
-                    {
-                        Lb_Status.Text = "Status: Decrypting files... Please do not close this window until decryption has been completed.";
-                    }));
-                    foreach (string file in SelectedFiles)
-                    {
-                        if (Lb_Status.ForeColor == Color.Red)
-                        {
-                            Invoke(new Action(() =>
-                            {
-                                Lb_Status.ForeColor = Color.Black;
-                            }));
-                        }
-                        else { }
-
-                        Invoke(new Action(() =>
-                        {
-                            Lb_FileProcessing.Text = "Processing file: " + file;
-                        }));
-
-                        try
-                        {
-                            string pass = Config.Password;
-                            byte[] data = File.ReadAllBytes(file);
-                            byte[] decryptedData = Tool.DecryptData(data, pass);
-
-                            File.WriteAllBytes(file, decryptedData);
-                        }
-                        catch
-                        {
-                            Invoke(new Action(() =>
-                            {
-                                Lb_Status.Text = $"Status: Error decrypting file: {file}.";
-                                Lb_Status.ForeColor = Color.Red;
-
-                                CryptList.Items.Add(file + " (Error: Decryption failed)");
-                            }));
-                            await Task.Delay(1); // Wait for 3s to show the error message
-                            Config.CryptographicOperationSucceeded = false;
-                            continue; // Skip to the next file
-                        }
-
-                        Invoke(new Action(() =>
-                        {
-                            CryptList.Items.Add(file);
-                        }));
-                        await Task.Delay(1); // Simulate some delay for UI update
-                    }
-                }
-                Invoke(new Action(() =>
-                {
-                    if (Config.CryptographicOperationSucceeded)
-                    {
-                        Lb_Status.Text = "Status: Operation completed successfully. You may close this window now.";
-                        Lb_Status.ForeColor = Color.Green;
-                        Lb_FileProcessing.Text = "All files processed successfully.";
-                        Lb_FileProcessing.ForeColor = Color.Green;
-                    }
-                    else
-                    {
-                        Lb_Status.Text = "Status: Operation completed with errors. Either key is incorrect or the files have been tampered with.";
-                        Lb_Status.ForeColor = Color.Red;
-                        Lb_FileProcessing.Text = "Some/all files could not be processed.";
-                        Lb_FileProcessing.ForeColor = Color.Red;
-                    }
-                }));
+                var (file, success) = update;
+                string text = success ? file : file + " (Error)";
+                CryptList.Items.Add(text);
+                if (!success) Config.CryptographicOperationSucceeded = false;
             });
+            var fileProgress = new Progress<string>(file =>
+            {
+                Lb_FileProcessing.Text = "Processing file: " + file;
+            });
+
+            Lb_Status.Text = Config.CryptoMode == Config.CryptographyMode.Encrypt
+                ? "Status: Encrypting files..."
+                : "Status: Decrypting files...";
+
+            await Task.Run(() =>
+            {
+                //Process file
+                if (appSetting.SmartWriteSelector_AllOutMode)
+                {
+                    CryptographicOperation.ProcessFiles(selectedFiles, Config.Password, Config.CryptoMode, generalProgress, fileProgress);
+                }
+                else
+                {
+                    CryptographicOperation.ProcessFiles(selectedFiles, Config.Password, appSetting.SmartWriteSelector_Threshold, Config.CryptoMode, generalProgress, fileProgress);
+                }
+            });
+
+            // Final UI update
+            Lb_Status.ForeColor = Config.CryptographicOperationSucceeded ? Color.Green : Color.Red;
+            Lb_Status.Text = Config.CryptographicOperationSucceeded
+                ? "Operation completed successfully."
+                : "Operation completed with errors.";
+            Lb_FileProcessing.Text = "Processing file: None";
         }
+
         private void CryptList_DrawItem(object sender, DrawItemEventArgs e)
         {
             if (e.Index < 0) return;
 
             string itemText = CryptList.Items[e.Index].ToString()!;
-            Color textColor = itemText.Contains("(Error: Decryption failed)") ? Color.Red : Color.Black;
 
-            e.DrawBackground();
-            using (Brush brush = new SolidBrush(textColor))
+            // Determine text color based on error and theme
+            Color textColor;
+            if (itemText.Contains("(Error)"))
             {
-                e.Graphics.DrawString(itemText, e.Font, brush, e.Bounds);
+                textColor = Color.Red; // Keep errors red
             }
+            else
+            {
+                textColor = appSetting.App_Theme == AppSetting.InternalTheme.Light
+                    ? Config.Color_LightTextColor
+                    : Config.Color_TextColor;
+            }
+
+            // Determine background color based on theme
+            Color backColor = appSetting.App_Theme == AppSetting.InternalTheme.Light
+                ? Config.Color_LightControlBackground
+                : Config.Color_ControlBackground;
+
+            e.Graphics.FillRectangle(new SolidBrush(backColor), e.Bounds);
+            e.Graphics.DrawString(itemText, e.Font, new SolidBrush(textColor), e.Bounds);
+
             e.DrawFocusRectangle();
         }
+
+        private void ApplyUserTheme()
+        {
+            if (appSetting.App_Theme == AppSetting.InternalTheme.Light)
+            {
+                this.BackColor = Config.Color_LightBackground;
+                CryptList.BackColor = Config.Color_LightControlBackground;
+                CryptList.ForeColor = Config.Color_LightTextColor;
+                Lb_Status.ForeColor = Config.Color_LightTextColor;
+                Lb_FileProcessing.ForeColor = Config.Color_LightTextColor;
+            }
+            else
+            {
+                this.BackColor = Config.Color_Background;
+                CryptList.BackColor = Config.Color_ControlBackground;
+                CryptList.ForeColor = Config.Color_TextColor;
+                Lb_Status.ForeColor = Config.Color_TextColor;
+                Lb_FileProcessing.ForeColor = Config.Color_TextColor;
+            }
+        }
+
     }
 }

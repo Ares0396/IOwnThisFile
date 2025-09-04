@@ -30,3 +30,9 @@ v1.1.0:
 - Improved byte unit handling: Everyone can see the file size in KB, MB, GB, etc, without having to peer their eyes at a large number in "byte" unit.
 - Enhanced cryptographic operations: Multi-thread operations are now supported, meaning that your files are protected more quickly.
 - Fixed a decryption bug: The app now does not accept AES-GCM-encrypted files that were not previously encrypted by the app itself
+v1.1.1
+- Fixed some bugs:
+   + Some windows are now fixed and cannot be resized.
+   + The app's title now displays the correct version
+   + Users will not see the warning of enabling Process All Files Parallelly option upon startup.
+- Optimized code for displaying the app's title

@@ -1,15 +1,21 @@
 
 using Main.Support_Tools;
+using System.Reflection;
 
 namespace Main
 {
     public partial class MainForm : Form
     {
         private AppSetting appSetting;
+        private bool formBeingInitialized = true; //Default
         public MainForm(AppSetting appSetting)
         {
             InitializeComponent();
             this.appSetting = appSetting;
+
+            //Update title
+            Version currentVer = Assembly.GetExecutingAssembly().GetName().Version!;
+            this.Text = $"IOwnThisFile v{currentVer.Major}.{currentVer.Minor}.{currentVer.Build}";
 
             //Apply settings from appSetting to the UI elements
             ApplySettings(appSetting);
@@ -666,11 +672,6 @@ namespace Main
             PropertyForm propertyForm = new();
             propertyForm.ShowDialog();
         }
-
-        private void MainForm_Load(object sender, EventArgs e)
-        {
-
-        }
         private void LkLb_ImportSettingFile_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             Dlg_OpenFiles_Setting.ShowDialog(); //Get the setting file
@@ -753,13 +754,23 @@ namespace Main
         {
             if (ChkBox_AllOutWriteMode.Checked)
             {
-                if (MessageBox.Show("All-Out Write Mode is a potentially dangerous mode that may slow your computer. Are you sure you want to continue?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+                if (!formBeingInitialized)
+                {
+                    if (MessageBox.Show("All-Out Write Mode is a potentially dangerous mode that may slow your computer. Are you sure you want to continue?", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+                    {
+                        appSetting.SmartWriteSelector_AllOutMode = true; //Enable All-Out Write Mode (TODO)
+                        NumUpDown_NumParallelProcessing.Enabled = false; //Disable Parallel Processing Number Thread selection (TODO)
+                        return;
+                    }
+                    ChkBox_AllOutWriteMode.Checked = false;
+                }
+                else
                 {
                     appSetting.SmartWriteSelector_AllOutMode = true; //Enable All-Out Write Mode (TODO)
                     NumUpDown_NumParallelProcessing.Enabled = false; //Disable Parallel Processing Number Thread selection (TODO)
+                    formBeingInitialized = false;
                     return;
                 }
-                ChkBox_AllOutWriteMode.Checked = false;
             }
             else
             {

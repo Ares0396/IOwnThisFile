@@ -31,18 +31,12 @@ Self-contained: just download, run, and protect your files.
 
 ## 📄 Changelog
 
-- Added a new feature: Check for updates.
-   + The application will now check for updates on startup by default and notify the user if a new version is available.
-   + Users can choose to download the latest version directly from the notification.
-   + Users can also choose not to receive any more update notifications in the settings.
-   + While updating, users can cancel the update.
-- Added a new feature: Setting & Preference.
-   + Save settings to registry or file (default is registry)
-   + White/black theme (default is white)
-   + Auto-check for updates on startup (default is enabled)
-- Improved byte unit handling: Everyone can see the file size in KB, MB, GB, etc, without having to peer their eyes at a large number in "byte" unit.
-- Enhanced cryptographic operations: Multi-thread operations are now supported, meaning that your files are protected more quickly.
-- Fixed a decryption bug: The app now does not accept AES-GCM-encrypted files that were not previously encrypted by the app itself
+v1.1.1
+- Fixed some bugs:
+   + Some windows are now fixed and cannot be resized.
+   + The app's title now displays the correct version
+   + Users will not see the warning of enabling Process All Files Parallelly option upon startup.
+- Optimized code for displaying the app's title
 
 ---
 
@@ -55,25 +49,26 @@ Self-contained: just download, run, and protect your files.
 5. Click **Encrypt** or **Decrypt**.  
 6. Manage your protected files in **File Management** tab.
 
-> ⚠️ Always test with **dummy files** first to confirm everything works as expected.
+> ⚠️ Always test with **dummy files** first to confirm everything works as expected. This project is written and maintained by a **9th grader**. Data corruption is **possible**.
 
 ---
 
 ## 🛡️ Privacy & Security
 
-- This app **does not connect to the internet**.  
+- This app only connects to the Internet to **check for newer updates**.
 - It **does not collect or transmit** any personal data.  
-- All operations happen locally on your machine.  
+- All operations happen locally on your machine apart from the **Check For Update** feature
 
 ---
 
 ## 🛠 Development Notes
 
-- Written in **C#** with **WinForms**
+- Written in **C#** with **WinForm**
 - Uses **.NET 8**
 - Encryption: **AES-GCM**  
 - Executable is **self-contained**, no extra installations needed
 - Source code available on Github
+- Proudly written and maintained by a Vietnamese 9th grader, tested by a British developer
 
 ---
 

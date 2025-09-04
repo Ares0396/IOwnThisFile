@@ -1,4 +1,6 @@
-﻿namespace Main
+﻿using Main.Support_Tools;
+
+namespace Main
 {
     partial class MainForm
     {
@@ -634,11 +636,11 @@
             Controls.Add(Main_TabControl);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Margin = new Padding(2);
+            MaximizeBox = false;
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "IOwnThisFile 1.0.2";
+            Text = "IOwnThisFile v1.0.2";
             FormClosing += MainForm_FormClosing;
-            Load += MainForm_Load;
             Tab_Decryption.ResumeLayout(false);
             Tab_Decryption.PerformLayout();
             Tab_Encryption.ResumeLayout(false);

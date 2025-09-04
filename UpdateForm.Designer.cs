@@ -213,6 +213,8 @@
             Controls.Add(Pn_UpdateCheck);
             Controls.Add(Pn_Update);
             Controls.Add(Pn_UpdateFound);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
+            MaximizeBox = false;
             Name = "UpdateForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "IOTF Updater";

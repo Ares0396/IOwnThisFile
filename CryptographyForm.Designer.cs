@@ -74,6 +74,8 @@
             Controls.Add(Lb_FileProcessing);
             Controls.Add(Lb_Status);
             Controls.Add(CryptList);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
+            MaximizeBox = false;
             Name = "CryptographyForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Cryptographic Operator";

@@ -95,9 +95,11 @@
             Controls.Add(Lb_LockStream);
             Controls.Add(Lb_FileSize);
             Controls.Add(Lb_FileName);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
+            MaximizeBox = false;
             Name = "PropertyForm";
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "Property";
+            Text = "View Property";
             Load += PropertyForm_Load;
             ResumeLayout(false);
             PerformLayout();

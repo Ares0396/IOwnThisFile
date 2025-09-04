@@ -284,7 +284,7 @@ namespace Main
                     File.WriteAllBytes(Config.UpdateChecker_TempFilePath, exeContent);
 
                     //Continue update Phase 2
-                    Process.Start(Config.UpdateChecker_TempFilePath, Config.Command_UpdatePhase2);
+                    Process.Start(Config.UpdateChecker_TempFilePath, $"{Config.Command_UpdatePhase2} \"{Config.ExePath}\"");
                     Application.Exit();
                 }
             }
@@ -294,6 +294,17 @@ namespace Main
         {
             Btn_CancelUpdate.Enabled = false;
             cts.Cancel(); //Signal cancellation
+        }
+
+        private async void Btn_UpdateCancel_Click(object sender, EventArgs e)
+        {
+            Lb_UpdateProgress.Text = "Update Status: Update cancelled by user. Starting app...";
+            await Task.Delay(1000);
+
+            Hide();
+            Form NewForm = new MainForm(appSetting);
+            NewForm.ShowDialog();
+            Close();
         }
     }
 }

@@ -121,6 +121,7 @@
             Btn_UpdateCancel.TabIndex = 7;
             Btn_UpdateCancel.Text = "Cancel";
             Btn_UpdateCancel.UseVisualStyleBackColor = true;
+            Btn_UpdateCancel.Click += Btn_UpdateCancel_Click;
             // 
             // Pn_UpdateCheck
             // 

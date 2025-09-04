@@ -12,8 +12,8 @@ Self-contained: just download, run, and protect your files.
 
 ## 🆕 Latest Release
 
-- **Version:** v1.1.0
-- **Published:** September 3, 2025  
+- **Version:** v1.1.2
+- **Published:** September 4, 2025  
 - **Download:** [Release page](https://github.com/Ares0396/IOwnThisFile/releases)  
 
 > No installation required beyond running the executable. Just double-click to start.
@@ -31,12 +31,9 @@ Self-contained: just download, run, and protect your files.
 
 ## 📄 Changelog
 
-v1.1.1
 - Fixed some bugs:
-   + Some windows are now fixed and cannot be resized.
-   + The app's title now displays the correct version
-   + Users will not see the warning of enabling Process All Files Parallelly option upon startup.
-- Optimized code for displaying the app's title
+   + The app now restarts after downloading and verifying the new version
+   + User can now choose to continue using the app without having to update the program
 
 ---
 

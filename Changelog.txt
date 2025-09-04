@@ -36,3 +36,7 @@ v1.1.1
    + The app's title now displays the correct version
    + Users will not see the warning of enabling Process All Files Parallelly option upon startup.
 - Optimized code for displaying the app's title
+v1.1.2
+- Fixed some bugs:
+   + The app now restarts after downloading and verifying the new version
+   + User can now choose to continue using the app without having to update the program

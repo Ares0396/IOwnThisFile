@@ -12,8 +12,8 @@ Self-contained: just download, run, and protect your files.
 
 ## 🆕 Latest Release
 
-- **Version:** v1.1.2
-- **Published:** September 4, 2025  
+- **Version:** v1.2.0
+- **Published:** September 20, 2025  
 - **Download:** [Release page](https://github.com/Ares0396/IOwnThisFile/releases)  
 
 > No installation required beyond running the executable. Just double-click to start.

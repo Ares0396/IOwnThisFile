@@ -199,10 +199,10 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label2.Location = new Point(171, 9);
+            label2.Font = new Font("Segoe UI", 15.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label2.Location = new Point(161, 9);
             label2.Name = "label2";
-            label2.Size = new Size(83, 21);
+            label2.Size = new Size(113, 30);
             label2.TabIndex = 2;
             label2.Text = "Updating...";
             // 
@@ -211,14 +211,15 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(435, 195);
-            Controls.Add(Pn_UpdateCheck);
             Controls.Add(Pn_Update);
             Controls.Add(Pn_UpdateFound);
+            Controls.Add(Pn_UpdateCheck);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
             Name = "UpdateForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "IOTF Updater";
+            FormClosing += UpdateForm_FormClosing;
             Load += UpdateForm_Load;
             Pn_UpdateFound.ResumeLayout(false);
             Pn_UpdateFound.PerformLayout();

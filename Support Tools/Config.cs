@@ -53,6 +53,7 @@ namespace Main.Support_Tools
         public static readonly string Command_UpdatePhase2 = "--update2"; //--update PathTo
         public static readonly string Command_UpdatePhase3 = "--update3";
         public static readonly string Command_GetExeHash = "--hash";
+        public static readonly string Command_DebugMode = "--debug";
 
         //AppSetting config
         public static readonly JsonSerializerOptions CachedJsonOptions = new() { WriteIndented = true };

@@ -348,6 +348,5 @@ namespace Main.Support_Tools
             e.Graphics.FillRectangle(backBrush, bounds);
             e.Graphics.DrawString(text, e.Font, textBrush, bounds, stringFormat);
         }
-
     }
 }

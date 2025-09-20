@@ -1,64 +1,154 @@
-﻿
+﻿using System.Buffers;
+using System.Security.Cryptography;
+
 namespace Main.Support_Tools
 {
     public static class CryptographicOperation
     {
         //File processing with custom settings
-        public static void ProcessFiles(List<string> files, string password, int maxParallelTasks, Config.CryptographyMode mode, IProgress<(string file, bool success)> generalProgress, IProgress<string> fileProgress)
+        public static async Task ProcessFilesAsync(List<string> files, string password, int maxParallelTasks, Config.CryptographyMode mode, IProgress<(string file, bool success)> generalProgress, IProgress<string> fileProgress)
         {
             ParallelOptions options = new() { MaxDegreeOfParallelism = maxParallelTasks };
 
-            Parallel.ForEach(files, options, file =>
+            await Parallel.ForEachAsync(files, options, async (file, token) =>
             {
                 bool success = true;
+                AES aes = new(password);
                 fileProgress.Report(file);
 
                 try
                 {
-                    string tempFile = file + ".tmp";
+                    if (new FileInfo(file).Length > int.MaxValue)
+                    {
+                        success = false;
+                        generalProgress.Report((file, success));
+                        return;
+                    }
 
-                    byte[] data = File.ReadAllBytes(file);
-                    byte[] processed = mode == Config.CryptographyMode.Encrypt
-                        ? Tool.EncryptData(data, password)
-                        : Tool.DecryptData(data, password);
-                    File.WriteAllBytes(file, processed);
+                    if (Config.CryptoMode == Config.CryptographyMode.Encrypt)
+                    {
+                        await aes.EncryptDataAsync(file);
+                    }
+                    else
+                    {
+                        await aes.DecryptDataAsync(file);
+                    }
                 }
-                catch
+                catch (Exception ex)
                 {
-                    success = false;
+                    Debugger.Handle(ex, () => success = false);
                 }
 
-                // Report progress to UI safely
                 generalProgress.Report((file, success));
-                
             });
         }
 
+
         //All parallel threads called for actions
-        public static void ProcessFiles(List<string> files, string password, Config.CryptographyMode mode, IProgress<(string file, bool success)> progress, IProgress<string> fileProgress)
+        public static async Task ProcessFilesAsync(List<string> files, string password, Config.CryptographyMode mode, IProgress<(string file, bool success)> progress, IProgress<string> fileProgress)
         {
-
-            Parallel.ForEach(files, file =>
+            await ProcessFilesAsync(files, password, -1, mode, progress, fileProgress);
+        }
+        public static string ComputeHash(byte[] data, HashAlgorithm hasher)
+        {
+            string stringHash = null!;
+            try
             {
-                bool success = true;
-                fileProgress.Report(file);
-
-                try
+                byte[] localHash = hasher.ComputeHash(data);
+                stringHash = FormatHash(localHash);
+            }
+            catch (Exception ex)
+            {
+                Debugger.Handle(ex, () =>
                 {
-                    byte[] data = File.ReadAllBytes(file);
-                    byte[] processed = mode == Config.CryptographyMode.Encrypt
-                        ? Tool.EncryptData(data, password)
-                        : Tool.DecryptData(data, password);
-                    File.WriteAllBytes(file, processed);
-                }
-                catch
+                    stringHash = string.Empty;
+                });
+            }
+            return stringHash;
+        }
+        public static async Task<string> ComputeHashAsync(Stream stream, IncrementalHash hasher, CancellationToken token, int chunkSize = 65536)
+        {
+            ArrayPool<byte> Pool = ArrayPool<byte>.Shared; //Define pooling provider
+            byte[] chunkBuffer = null!;
+            bool bufferRented = false;
+            string hash = null!;
+
+            try
+            {
+                if (chunkSize >= 1024)
                 {
-                    success = false;
+                    chunkBuffer = Pool.Rent(chunkSize); //Use buffer pooling for >1KB bytes
+                    bufferRented = true; //Make sure the cleanup mechanism knows it's rented
+                }
+                else
+                {
+                    chunkBuffer = new byte[chunkSize]; //Use allocation
+                    //No need for setting the flag to false, as it's already defined as false above
                 }
 
-                // Report progress to UI safely
-                progress.Report((file, success));
-            });
+                if (stream.CanSeek) stream.Seek(0, SeekOrigin.Begin); //Reset position
+
+                int bytesRead;
+                while ((bytesRead = await stream.ReadAsync(chunkBuffer.AsMemory(0, chunkBuffer.Length), token)) > 0)
+                {
+                    hasher.AppendData(chunkBuffer, 0, bytesRead); //Feed the hasher chunk by chunk
+                }
+
+                //Get final hash and return the equivalent string
+                byte[] hashBytes = hasher.GetHashAndReset();
+                hash = FormatHash(hashBytes);
+            }
+            catch (Exception ex)
+            {
+                Debugger.Handle(ex, () =>
+                {
+                    hash = string.Empty;
+                });
+            }
+            finally
+            {
+                if (bufferRented) //If it's rented
+                {
+                    Pool.Return(chunkBuffer, true);
+                }
+            }
+            return hash;
+        }
+        private static string FormatHash(byte[] hash)
+        {
+            if (hash == null || hash == Array.Empty<byte>())
+            {
+                return string.Empty;
+                throw new ArgumentNullException("Hash must not be empty");
+            }
+            string stringHash = BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+            return stringHash;
+        }
+
+        public static byte[] GenerateRandomBytes(int length)
+        {
+            byte[] randomBytes = new byte[length];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomBytes);
+            }
+            return randomBytes;
+        }
+        public static async Task GenerateRandomBytesAsync(long length, Stream output, int chunkSize = 8192)
+        {
+            byte[] buffer = new byte[chunkSize];
+            long bytesRemaining = length;
+
+            using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
+            {
+                while (bytesRemaining > 0)
+                {
+                    int bytesToWrite = (int)Math.Min(chunkSize, bytesRemaining);
+                    rng.GetBytes(buffer, 0, bytesToWrite);
+                    await output.WriteAsync(buffer.AsMemory(0, bytesToWrite));
+                    bytesRemaining -= bytesToWrite;
+                }
+            }
         }
     }
 }

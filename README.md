@@ -31,9 +31,16 @@ Self-contained: just download, run, and protect your files.
 
 ## 📄 Changelog
 
-- Fixed some bugs:
-   + The app now restarts after downloading and verifying the new version
-   + User can now choose to continue using the app without having to update the program
+- Update feature:
+   + Improved UI feedbacks and added Progress feedback for downloading and copying file.
+   + Reduced RAM usage for downloading new updates.
+- NEW: Debug mode:
+   + Developers and testers can now debug the app more easily.
+   + Enhance maintainance quality.
+   + Users can attach a debugger via Task Manager (run the app with --debug).
+- Optimized code for functionality:
+   + Prepare the app for new encryption-decryption developments (specifically AES-CTR + HMAC-SHA256, RSA, DPAPI and advanced IO-Lock)
+   + Uses more async implementation
 
 ---
 
@@ -60,12 +67,9 @@ Self-contained: just download, run, and protect your files.
 
 ## 🛠 Development Notes
 
-- Written in **C#** with **WinForm**
-- Uses **.NET 8**
-- Encryption: **AES-GCM**  
-- Executable is **self-contained**, no extra installations needed
-- Source code available on Github
-- Proudly written and maintained by a Vietnamese 9th grader, tested by a British developer
+- I, as the author of this project, may have to discontinue this project due to academic pressure.
+- For the time being, however, I'll try my best to update and maintain this project.
+- Good day to you! Written by a Vietnamese 9th grader, tested by a British friend.
 
 ---
 

@@ -13,6 +13,7 @@ namespace Main
         {
             //Initialize app and get ready to apply settings before running
             ApplicationConfiguration.Initialize();
+            Debugger.AttachGlobalHandlers();
 
             //Handle startup commands
             if (args.Length > 0)
@@ -37,7 +38,7 @@ namespace Main
                     byte[] buffer = File.ReadAllBytes(Config.UpdateChecker_TempFilePath);
 
                     //Hash exe
-                    string hash = Tool.HashContent(buffer, SHA256.Create());
+                    string hash = CryptographicOperation.ComputeHash(buffer, SHA256.Create());
 
                     //Print the hash and copy to clipboard
                     Console.WriteLine(hash);
@@ -46,6 +47,11 @@ namespace Main
                     //Delete temp
                     File.Delete(Config.UpdateChecker_TempFilePath);
                     Console.ReadKey();
+                }
+                else if (args[0] == Config.Command_DebugMode)
+                {
+                    Debugger.Enabled = true;
+                    Application.Run(new UpdateForm());
                 }
                 else
                 {

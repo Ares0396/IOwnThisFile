@@ -40,3 +40,14 @@ v1.1.2
 - Fixed some bugs:
    + The app now restarts after downloading and verifying the new version
    + User can now choose to continue using the app without having to update the program
+v1.2.0
+- Update feature:
+   + Improved UI feedbacks and added Progress feedback for downloading and copying file.
+   + Reduced RAM usage for downloading new updates.
+- NEW: Debug mode:
+   + Developers and testers can now debug the app more easily.
+   + Enhance maintainance quality.
+   + Users can attach a debugger via Task Manager (run the app with --debug).
+- Optimized code for functionality:
+   + Prepare the app for new encryption-decryption developments (specifically AES-CTR + HMAC-SHA256, RSA, DPAPI and advanced IO-Lock)
+   + Uses more async implementation

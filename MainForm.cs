@@ -111,7 +111,7 @@ namespace Main
                 {
                     foreach (string file in SelectedFiles)
                     {
-                        FileStream lockStream = Tool.InitializeLockStream(file);
+                        FileStream lockStream = LockStream.Initialize(file);
                         if (lockStream != null)
                         {
                             // Add the lock stream to the dictionary
@@ -380,7 +380,7 @@ namespace Main
                     {
                         continue; //Make sure to skip files that are already locked (avoid edgy cases)
                     }
-                    FileStream lockStream = Tool.InitializeLockStream(file);
+                    FileStream lockStream = LockStream.Initialize(file);
                     if (lockStream != null)
                     {
                         Config.LockStream_Dictionary.Add(file, lockStream);
@@ -454,166 +454,138 @@ namespace Main
             List<string> LockedFiles = [];
             List<string> UnlockedFiles = [];
             List<string> errorMessages = [];
-            byte[] randomData;
 
-            await Task.Run(() =>
+            //Get and differentiate the locked and unlocked files from the ListBox
+            List<string> LockedFiles_Original = EncFile_List.SelectedItems.Cast<string>()
+            .Where(item => item.Contains("(IO-Locked)"))
+            .ToList();
+            foreach (string file in LockedFiles_Original)
             {
-                //Get and differentiate the locked and unlocked files from the ListBox
-                List<string> LockedFiles_Original = EncFile_List.SelectedItems.Cast<string>()
-                .Where(item => item.Contains("(IO-Locked)"))
+                string fileName = file.Replace(" (IO-Locked)", "");
+                LockedFiles.Add(fileName);
+            }
+
+            //The same for unlocked files
+            List<string> UnlockedFiles_Original = EncFile_List.SelectedItems.Cast<string>()
+                .Where(item => !item.Contains("(IO-Locked)"))
                 .ToList();
-                foreach (string file in LockedFiles_Original)
+            foreach (string file in UnlockedFiles_Original)
+            {
+                string fileName = file.Replace(" (IO-Locked)", "");
+                UnlockedFiles.Add(fileName);
+            }
+
+            //Check if there are any files to delete
+            if (LockedFiles.Count == 0 && UnlockedFiles.Count == 0)
+            {
+                errorMessages.Add("There are no files selected for deletion.");
+                return;
+            }
+
+            //Unlock all locked files first
+            foreach (string file in LockedFiles)
+            {
+                if (Config.LockStream_Dictionary.TryGetValue(file, out FileStream? lockStream))
                 {
-                    string fileName = file.Replace(" (IO-Locked)", "");
-                    LockedFiles.Add(fileName);
-                }
+                    //Unleash the lock stream
+                    lockStream.Dispose();
+                    lockStream.Close();
+                    Config.LockStream_Dictionary.Remove(file);
 
-                //The same for unlocked files
-                List<string> UnlockedFiles_Original = EncFile_List.SelectedItems.Cast<string>()
-                    .Where(item => !item.Contains("(IO-Locked)"))
-                    .ToList();
-                foreach (string file in UnlockedFiles_Original)
-                {
-                    string fileName = file.Replace(" (IO-Locked)", "");
-                    UnlockedFiles.Add(fileName);
-                }
-
-                //Check if there are any files to delete
-                if (LockedFiles.Count == 0 && UnlockedFiles.Count == 0)
-                {
-                    errorMessages.Add("There are no files selected for deletion.");
-                    return;
-                }
-
-                //Unlock all locked files first
-                foreach (string file in LockedFiles)
-                {
-                    if (Config.LockStream_Dictionary.TryGetValue(file, out FileStream? lockStream))
-                    {
-                        //Unleash the lock stream
-                        lockStream.Dispose();
-                        lockStream.Close();
-                        Config.LockStream_Dictionary.Remove(file);
-
-                        //Remove info from config.cs
-                        Config.Property_FileLastLockstreamed.Remove(file);
-                        Config.Property_FileLastEncrypted.Remove(file);
-                    }
-                    else
-                    {
-                        Config.Property_FileLastEncrypted.Remove(file); //If the file is not locked, just remove the last encrypted date
-                        continue;
-                    }
-                }
-
-                //Now we have both lists ready, we can delete the files
-                //Check if the user wants to securely shred the files
-                if (ChkBox_SecureShred.Checked)
-                {
-                    foreach (string file in LockedFiles)
-                    {
-                        try
-                        {
-                            //Get the file size
-                            long fileSize = new FileInfo(file).Length;
-
-                            //Get random data
-                            if (fileSize <= int.MaxValue)
-                            {
-                                randomData = Tool.GenerateRandomBytes((int)fileSize);
-                            }
-                            else
-                            {
-                                using (MemoryStream ms = new())
-                                {
-                                    Tool.GenerateRandomBytes(fileSize, ms);
-                                    randomData = ms.ToArray();
-                                }
-                            }
-
-                            //Overwrite the file with random data
-                            File.WriteAllBytes(file, randomData);
-
-                            //Delete the file
-                            File.Delete(file);
-                        }
-                        catch (Exception ex)
-                        {
-                            errorMessages.Add($"Failed to delete file: {file}. Error: {ex.Message}");
-                        }
-                    }
-                    foreach (string file in UnlockedFiles)
-                    {
-                        try
-                        {
-                            //Get the file size
-                            long fileSize = new FileInfo(file).Length;
-
-                            //Get random data
-                            if (fileSize <= int.MaxValue)
-                            {
-                                randomData = Tool.GenerateRandomBytes((int)fileSize);
-                            }
-                            else
-                            {
-                                using (MemoryStream ms = new())
-                                {
-                                    Tool.GenerateRandomBytes(fileSize, ms);
-                                    randomData = ms.ToArray();
-                                }
-                            }
-
-                            //Overwrite the file with random data
-                            File.WriteAllBytes(file, randomData);
-
-                            //Delete the file
-                            File.Delete(file);
-                        }
-                        catch (Exception ex)
-                        {
-                            errorMessages.Add($"Failed to delete file: {file}. Error: {ex.Message}");
-                        }
-                    }
+                    //Remove info from config.cs
+                    Config.Property_FileLastLockstreamed.Remove(file);
+                    Config.Property_FileLastEncrypted.Remove(file);
                 }
                 else
                 {
-                    foreach (string file in LockedFiles)
+                    Config.Property_FileLastEncrypted.Remove(file); //If the file is not locked, just remove the last encrypted date
+                    continue;
+                }
+            }
+
+            //Now we have both lists ready, we can delete the files
+            //Check if the user wants to securely shred the files
+            if (ChkBox_SecureShred.Checked)
+            {
+                foreach (string file in LockedFiles)
+                {
+                    try
                     {
-                        try
+                        //Get the file size
+                        long fileSize = new FileInfo(file).Length;
+
+                        using (FileStream fs = new(file, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
                         {
-                            File.Delete(file);
+                            await CryptographicOperation.GenerateRandomBytesAsync(fileSize, fs); //Write random data
                         }
-                        catch (Exception ex)
-                        {
-                            errorMessages.Add($"Failed to delete file: {file}. Error: {ex.Message}");
-                        }
+
+                        //Delete the file
+                        File.Delete(file);
                     }
-                    foreach (string file in UnlockedFiles)
+                    catch (Exception ex)
                     {
-                        try
-                        {
-                            File.Delete(file);
-                        }
-                        catch (Exception ex)
-                        {
-                            errorMessages.Add($"Failed to delete file: {file}. Error: {ex.Message}");
-                        }
+                        errorMessages.Add($"Failed to delete file: {file}. Error: {ex.Message}");
                     }
                 }
-
-                //Update the ListBox after deletion
-                Invoke(new Action(() =>
+                foreach (string file in UnlockedFiles)
                 {
-                    foreach (string file in LockedFiles_Original)
+                    try
                     {
-                        EncFile_List.Items.Remove(file);
+                        //Get the file size
+                        long fileSize = new FileInfo(file).Length;
+
+                        using (FileStream fs = new(file, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+                        {
+                            await CryptographicOperation.GenerateRandomBytesAsync(fileSize, fs); //Write random data
+                        }
+
+                        //Delete the file
+                        File.Delete(file);
                     }
-                    foreach (string file in UnlockedFiles_Original)
+                    catch (Exception ex)
                     {
-                        EncFile_List.Items.Remove(file);
+                        errorMessages.Add($"Failed to delete file: {file}. Error: {ex.Message}");
                     }
-                }));
-            });
+                }
+            }
+            else
+            {
+                foreach (string file in LockedFiles)
+                {
+                    try
+                    {
+                        File.Delete(file);
+                    }
+                    catch (Exception ex)
+                    {
+                        errorMessages.Add($"Failed to delete file: {file}. Error: {ex.Message}");
+                    }
+                }
+                foreach (string file in UnlockedFiles)
+                {
+                    try
+                    {
+                        File.Delete(file);
+                    }
+                    catch (Exception ex)
+                    {
+                        errorMessages.Add($"Failed to delete file: {file}. Error: {ex.Message}");
+                    }
+                }
+            }
+
+            //Update the ListBox after deletion
+            Invoke(new Action(() =>
+            {
+                foreach (string file in LockedFiles_Original)
+                {
+                    EncFile_List.Items.Remove(file);
+                }
+                foreach (string file in UnlockedFiles_Original)
+                {
+                    EncFile_List.Items.Remove(file);
+                }
+            }));
 
             //Show a message box indicating the end of the operation
             if (errorMessages.Count > 0)

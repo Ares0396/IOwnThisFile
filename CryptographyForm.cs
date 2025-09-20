@@ -1,8 +1,4 @@
 ﻿using Main.Support_Tools;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Windows.Forms;
 
 namespace Main
 {
@@ -48,18 +44,15 @@ namespace Main
                 ? "Status: Encrypting files..."
                 : "Status: Decrypting files...";
 
-            await Task.Run(() =>
+            //Process file
+            if (appSetting.SmartWriteSelector_AllOutMode)
             {
-                //Process file
-                if (appSetting.SmartWriteSelector_AllOutMode)
-                {
-                    CryptographicOperation.ProcessFiles(selectedFiles, Config.Password, Config.CryptoMode, generalProgress, fileProgress);
-                }
-                else
-                {
-                    CryptographicOperation.ProcessFiles(selectedFiles, Config.Password, appSetting.SmartWriteSelector_Threshold, Config.CryptoMode, generalProgress, fileProgress);
-                }
-            });
+                await CryptographicOperation.ProcessFilesAsync(selectedFiles, Config.Password, Config.CryptoMode, generalProgress, fileProgress);
+            }
+            else
+            {
+                await CryptographicOperation.ProcessFilesAsync(selectedFiles, Config.Password, appSetting.SmartWriteSelector_Threshold, Config.CryptoMode, generalProgress, fileProgress);
+            }
 
             // Final UI update
             Lb_Status.ForeColor = Config.CryptographicOperationSucceeded ? Color.Green : Color.Red;

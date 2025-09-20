@@ -1,5 +1,4 @@
-﻿
-using Main.Support_Tools;
+﻿using Main.Support_Tools;
 
 namespace Main
 {
@@ -24,7 +23,7 @@ namespace Main
                 ? value : DateTime.MinValue;
             string lastLockedText;
             string lastEncryptedText;
-            string fileSizeText = Tool.ConvertRawBytes(fileSize);
+            string fileSizeText = ByteUnit.ConvertRawBytes(fileSize);
 
             //Customize and refine the display text
             if (isLocked)
@@ -34,7 +33,7 @@ namespace Main
                     : "Last time IO-Locked: " + "File is locked but no lock time recorded.";
 
                 //We just unlocked the lockstream temporarily, but since it's considered locked, we need to lock it again, without updating the time
-                FileStream lockStream = Tool.InitializeLockStream(FilePath);
+                FileStream lockStream = LockStream.Initialize(FilePath);
                 Config.LockStream_Dictionary.Add(FilePath, lockStream);
             }
             else lastLockedText = "Last time IO-Locked: " + "File is not locked.";

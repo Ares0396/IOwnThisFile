@@ -1,7 +1,7 @@
 using Main.Support_Tools;
 using System.Security.Cryptography;
 
-namespace Main
+namespace Main.Forms
 {
     internal static class Program
     {
@@ -13,7 +13,11 @@ namespace Main
         {
             //Initialize app and get ready to apply settings before running
             ApplicationConfiguration.Initialize();
-            Debugger.AttachGlobalHandlers();
+            Debugger.AttachGlobalHandlers(() =>
+            {
+                MessageBox.Show("A fatal error occurred. Click \"Ok\" to close the program.", "Fatal error occurred.", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Environment.Exit(1);
+            });
 
             //Handle startup commands
             if (args.Length > 0)

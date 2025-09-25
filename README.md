@@ -12,8 +12,8 @@ Self-contained: just download, run, and protect your files.
 
 ## 🆕 Latest Release
 
-- **Version:** v1.2.0
-- **Published:** September 20, 2025  
+- **Version:** v1.2.1
+- **Published:** September 25, 2025  
 - **Download:** [Release page](https://github.com/Ares0396/IOwnThisFile/releases)  
 
 > No installation required beyond running the executable. Just double-click to start.
@@ -31,16 +31,11 @@ Self-contained: just download, run, and protect your files.
 
 ## 📄 Changelog
 
-- Update feature:
-   + Improved UI feedbacks and added Progress feedback for downloading and copying file.
-   + Reduced RAM usage for downloading new updates.
-- NEW: Debug mode:
-   + Developers and testers can now debug the app more easily.
-   + Enhance maintainance quality.
-   + Users can attach a debugger via Task Manager (run the app with --debug).
-- Optimized code for functionality:
-   + Prepare the app for new encryption-decryption developments (specifically AES-CTR + HMAC-SHA256, RSA, DPAPI and advanced IO-Lock)
-   + Uses more async implementation
+- Fixed the UI:
+   + The app now does not crash when the user IO-Locked, IO-Unlocked and IO-Locked a file again.
+   + The selected items for IO-Lock operations now stay fixed instead of being moved to the bottom of the list.
+- Fixed a bug in the Debugger: It now also catches exceptions from the WinForms.
+- Improved cryptographic operation: Memory is instantly returned to the OS instead of being piled up (with a bit of small overhead).
 
 ---
 

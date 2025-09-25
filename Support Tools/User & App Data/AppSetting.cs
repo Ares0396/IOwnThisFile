@@ -320,7 +320,7 @@ namespace Main.Support_Tools
                 }
             }
         }
-        private static void TabControl_DrawItem(object? sender, DrawItemEventArgs e)
+        private static void TabControl_DrawItem(object sender, DrawItemEventArgs e)
         {
             if (sender is not TabControl tabControl) return;
 

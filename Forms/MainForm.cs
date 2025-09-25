@@ -1,4 +1,3 @@
-
 using Main.Support_Tools;
 using System.Reflection;
 
@@ -141,7 +140,7 @@ namespace Main
                         }));
 
                         //Save info to Config.cs
-                        Config.Property_FileLastEncrypted.Add(file, DateTime.Now); //No need for IO-Lock, since the file is not locked
+                        Config.Property_FileLastEncrypted[file] = DateTime.Now;
                     }
                 }
 
@@ -252,7 +251,7 @@ namespace Main
                 //Unlock relevant lock streams and delete related entries from the File Management tab
                 foreach (string file in SelectedFiles)
                 {
-                    if (Config.LockStream_Dictionary.TryGetValue(file, out FileStream? value))
+                    if (Config.LockStream_Dictionary.TryGetValue(file, out var value))
                     {
                         //Unleash the lock stream
                         value.Dispose();
@@ -384,11 +383,16 @@ namespace Main
                     if (lockStream != null)
                     {
                         Config.LockStream_Dictionary.Add(file, lockStream);
-                        Config.Property_FileLastLockstreamed.Add(file, DateTime.Now); // Save the lock time
+
+                        //Bug fixed: No more same key with 2 values
+                        Config.Property_FileLastLockstreamed[file] = DateTime.Now;
+
                         Invoke(new Action(() =>
                         {
+                            int index = EncFile_List.Items.IndexOf(file); //Get index
+
                             EncFile_List.Items.Remove(file); // Remove the original entry
-                            EncFile_List.Items.Add(file + " (IO-Locked)"); // Add the locked entry with "(IO-Locked)" suffix
+                            EncFile_List.Items.Insert(index, file + " (IO-Locked)"); // Add the locked entry with "(IO-Locked)" suffix
                         }));
                     }
                     else
@@ -400,7 +404,7 @@ namespace Main
                 //Same for locked files-Unlock them
                 foreach (string file in LockedFiles)
                 {
-                    if (!Config.LockStream_Dictionary.TryGetValue(file, out FileStream? lockStream))
+                    if (!Config.LockStream_Dictionary.TryGetValue(file, out var lockStream))
                     {
                         continue; //Make sure to skip files that are not locked
                     }
@@ -411,8 +415,10 @@ namespace Main
 
                     Invoke(new Action(() =>
                     {
+                        int index = EncFile_List.Items.IndexOf(file + " (IO-Locked)"); //Get index
+
                         EncFile_List.Items.Remove(file + " (IO-Locked)"); // Remove the locked entry
-                        EncFile_List.Items.Add(file); // Add the unlocked entry without "(IO-Locked)" suffix
+                        EncFile_List.Items.Insert(index, file); // Add the unlocked entry without "(IO-Locked)" suffix
                     }));
                 }
             });
@@ -485,7 +491,7 @@ namespace Main
             //Unlock all locked files first
             foreach (string file in LockedFiles)
             {
-                if (Config.LockStream_Dictionary.TryGetValue(file, out FileStream? lockStream))
+                if (Config.LockStream_Dictionary.TryGetValue(file, out var lockStream))
                 {
                     //Unleash the lock stream
                     lockStream.Dispose();
@@ -617,7 +623,7 @@ namespace Main
             Config.Property_FileIsLocked = EncFile_List.SelectedItem.ToString()!.Contains("(IO-Locked)");
 
             //Check if the file is locked. If locked, then unleash temporarily. After we have the information, we will lock it again.
-            if (Config.LockStream_Dictionary.TryGetValue(Config.Property_FilePath, out FileStream? lockStream))
+            if (Config.LockStream_Dictionary.TryGetValue(Config.Property_FilePath, out var lockStream))
             {
                 try
                 {

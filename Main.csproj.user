@@ -8,16 +8,16 @@
     <DebuggerFlavor>ProjectDebugger</DebuggerFlavor>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Update="CryptographyForm.cs">
+    <Compile Update="Forms\CryptographyForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="MainForm.cs">
+    <Compile Update="Forms\MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="PropertyForm.cs">
+    <Compile Update="Forms\PropertyForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="UpdateForm.cs">
+    <Compile Update="Forms\UpdateForm.cs">
       <SubType>Form</SubType>
     </Compile>
   </ItemGroup>

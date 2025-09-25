@@ -4,10 +4,10 @@ namespace Main.Support_Tools
 {
     public class Streamer
     {
-        public static async Task WriteDownloadedDataAsync(string URL, Stream stream, IProgress<double> progress, int chunkSize = 65536, HttpClient? client = null, int retryMax = 1, CancellationToken token = default)
+        public static async Task WriteDownloadedDataAsync(string URL, Stream stream, IProgress<double> progress, int chunkSize = 65536, HttpClient client = null, int retryMax = 1, CancellationToken token = default)
         {
             ArrayPool<byte> Pool = ArrayPool<byte>.Shared; //Define pooling provider
-            byte[]? chunkBuffer = null; //Silence the compiler error
+            byte[] chunkBuffer = null; //Silence the compiler error
             bool bufferRented = false;
             bool success = false;
             int attemptCount = 0;

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows10.0.22000.0</TargetFramework>
-    <Nullable>enable</Nullable>
+    <Nullable>warnings</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <StartupObject></StartupObject>
@@ -20,8 +20,9 @@
     <AssemblyName>IOwnThisFile</AssemblyName>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <Version>1.1.0</Version>
-    <FileVersion>1.2.0</FileVersion>
-    <AssemblyVersion>1.2.0</AssemblyVersion>
+    <FileVersion>1.2.1</FileVersion>
+    <AssemblyVersion>1.2.1</AssemblyVersion>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>

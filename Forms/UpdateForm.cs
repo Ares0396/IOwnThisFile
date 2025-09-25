@@ -9,7 +9,7 @@ namespace Main
     public partial class UpdateForm : Form
     {
         private readonly CancellationTokenSource cts = new();
-        AppSetting? appSetting;
+        AppSetting appSetting;
 
         public UpdateForm()
         {
@@ -22,7 +22,7 @@ namespace Main
             Pn_UpdateFound.Visible = false;
             Pn_Update.Visible = false;
 
-            RegistryKey? key = Registry.CurrentUser.OpenSubKey(Config.Reg_AppSettingPath);
+            RegistryKey key = Registry.CurrentUser.OpenSubKey(Config.Reg_AppSettingPath);
             if (key != null)
             {
                 appSetting = AppSetting.LoadSettings(); //Load settings

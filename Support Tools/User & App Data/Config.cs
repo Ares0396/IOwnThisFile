@@ -9,7 +9,7 @@ namespace Main.Support_Tools
         public static Dictionary<string, FileStream> LockStream_Dictionary { get; set; } = []; //LockStream dictionary
 
         //Cryptography config for AES-GCM
-        public static string AAD_Header { get; set; } = "IOTF v1.0";
+        public static readonly string AAD_Header = "IOTF v1.0";
         public static readonly int TagSize = 16;
         public static readonly int Iteration = 500000;
         public static readonly HashAlgorithmName RFC_Algorithm = HashAlgorithmName.SHA256;
@@ -26,6 +26,9 @@ namespace Main.Support_Tools
         }
         public static CryptographyMode CryptoMode { get; set; } = CryptographyMode.Encrypt; //Default mode is Encrypt
         public static bool CryptographicOperationSucceeded { get; set; } = true;
+
+        //Parameters for RSA
+        public readonly static RSAEncryptionPadding RSAPadding = RSAEncryptionPadding.OaepSHA512;
 
         //Property config
         public static string Property_FilePath { get; set; } = string.Empty; //default is empty
@@ -67,6 +70,7 @@ namespace Main.Support_Tools
         public static readonly string Reg_SmartWriteSelectorThreshold = "SmartWriteSelectorThreshold"; //Registry name for Smart Write Selector threshold (value)
         public static readonly string Reg_SmartWriteSelectorAllOutMode = "SmartWriteSelectorAllOutMode"; //Registry name for Smart Write Selector all-out mode (value)
         public static readonly string Reg_SettingSaveMode = "SettingSaveMode"; //Registry name for setting save mode (string value)
+        public static readonly string Reg_OptimizeSpeedOrRes = "SpeedRes";
 
         //Color config (For Dark Mode)
         public static readonly Color Color_Background = Color.FromArgb(45, 45, 48);   // Dark gray form background

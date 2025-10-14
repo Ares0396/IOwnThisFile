@@ -12,8 +12,8 @@ Self-contained: just download, run, and protect your files.
 
 ## 🆕 Latest Release
 
-- **Version:** v1.2.1
-- **Published:** September 25, 2025  
+- **Version:** v1.3.0
+- **Published:** October 14, 2025  
 - **Download:** [Release page](https://github.com/Ares0396/IOwnThisFile/releases)  
 
 > No installation required beyond running the executable. Just double-click to start.
@@ -31,11 +31,14 @@ Self-contained: just download, run, and protect your files.
 
 ## 📄 Changelog
 
-- Fixed the UI:
-   + The app now does not crash when the user IO-Locked, IO-Unlocked and IO-Locked a file again.
-   + The selected items for IO-Lock operations now stay fixed instead of being moved to the bottom of the list.
-- Fixed a bug in the Debugger: It now also catches exceptions from the WinForms.
-- Improved cryptographic operation: Memory is instantly returned to the OS instead of being piled up (with a bit of small overhead).
+- Added a new feature: Users can now choose to either stabilize RAM for slower operations or maximize performance for RAM consumptions.
+- Fixed bugs:
+   + The text of the list box in File Management now has white color when the background color is dark.
+   + After cancelling a new update, users now no longer see "Checking for update", which may be confusing.
+- Enhancement: 
+   + Small fixes to make the UI more responsive.
+   + New cryptographic developments are still underway.
+- Known bug (INTENTIONAL): Encrypted files grow to match the same size as the largest one in a selected group when users opt to save resources.
 
 ---
 

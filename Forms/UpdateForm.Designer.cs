@@ -211,9 +211,9 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(435, 195);
+            Controls.Add(Pn_UpdateCheck);
             Controls.Add(Pn_Update);
             Controls.Add(Pn_UpdateFound);
-            Controls.Add(Pn_UpdateCheck);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
             Name = "UpdateForm";

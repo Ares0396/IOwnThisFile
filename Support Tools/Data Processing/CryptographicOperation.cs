@@ -1,4 +1,5 @@
-﻿using System.Buffers;
+﻿using Main.Support_Tools.Memory_Management;
+using System.Buffers;
 using System.Security.Cryptography;
 
 namespace Main.Support_Tools
@@ -6,32 +7,60 @@ namespace Main.Support_Tools
     public static class CryptographicOperation
     {
         //File processing with custom settings
-        public static async Task ProcessFilesAsync(List<string> files, string password, int maxParallelTasks, Config.CryptographyMode mode, IProgress<(string file, bool success)> generalProgress, IProgress<string> fileProgress)
+        public static async Task ProcessFilesAsync(List<string> files, string password, int maxParallelTasks, Config.CryptographyMode mode, IProgress<(string file, bool success)> generalProgress, IProgress<string> fileProgress, bool reuse)
         {
             ParallelOptions options = new() { MaxDegreeOfParallelism = maxParallelTasks };
+            AES aes = new(password);
+            UnmanagedMemory<byte> mem = null;
+
+            if (reuse)
+            {
+                int maxSize = 0;
+                foreach (string file in files)
+                {
+                    FileInfo fileInfo = new(file);
+                    long fileSize = fileInfo.Length;
+                    if (fileSize > maxSize) maxSize = (int)fileSize;
+                }
+                if (maxSize == 0) throw new InvalidOperationException("Zero size detected - There's possibly no file to encrypt/decrypt.");
+                mem = new(maxSize);
+            }
 
             await Parallel.ForEachAsync(files, options, async (file, token) =>
             {
-                bool success = true;
-                AES aes = new(password);
+                bool success = true; 
                 fileProgress.Report(file);
 
                 try
                 {
-                    if (new FileInfo(file).Length > int.MaxValue)
+                    if (new FileInfo(file).Length > int.MaxValue || new FileInfo(file).Length == 0)
                     {
                         success = false;
                         generalProgress.Report((file, success));
                         return;
                     }
 
-                    if (Config.CryptoMode == Config.CryptographyMode.Encrypt)
+                    if (reuse)
                     {
-                        await aes.EncryptDataAsync(file);
+                        if (mode == Config.CryptographyMode.Encrypt)
+                        {
+                            await aes.EncryptDataAsync(file, mem);
+                        }
+                        else
+                        {
+                            await aes.DecryptDataAsync(file, mem);
+                        }
                     }
                     else
                     {
-                        await aes.DecryptDataAsync(file);
+                        if (mode == Config.CryptographyMode.Encrypt)
+                        {
+                            await aes.EncryptDataAsync(file);
+                        }
+                        else
+                        {
+                            await aes.DecryptDataAsync(file);
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -41,13 +70,15 @@ namespace Main.Support_Tools
 
                 generalProgress.Report((file, success));
             });
+            mem?.Dispose();
+            aes.Dispose();
         }
 
 
         //All parallel threads called for actions
-        public static async Task ProcessFilesAsync(List<string> files, string password, Config.CryptographyMode mode, IProgress<(string file, bool success)> progress, IProgress<string> fileProgress)
+        public static async Task ProcessFilesAsync(List<string> files, string password, Config.CryptographyMode mode, IProgress<(string file, bool success)> progress, IProgress<string> fileProgress, bool reuse)
         {
-            await ProcessFilesAsync(files, password, -1, mode, progress, fileProgress);
+            await ProcessFilesAsync(files, password, -1, mode, progress, fileProgress, reuse);
         }
         public static string ComputeHash(byte[] data, HashAlgorithm hasher)
         {

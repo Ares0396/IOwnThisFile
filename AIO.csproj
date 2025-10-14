@@ -19,10 +19,18 @@
     <RepositoryUrl>https://github.com/Ares0396/IOwnThisFile</RepositoryUrl>
     <AssemblyName>IOwnThisFile</AssemblyName>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <Version>1.1.0</Version>
-    <FileVersion>1.2.1</FileVersion>
-    <AssemblyVersion>1.2.1</AssemblyVersion>
+    <Version>1.3.0</Version>
+    <FileVersion>1.3.0</FileVersion>
+    <AssemblyVersion>1.3.0</AssemblyVersion>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <FileAlignment>8192</FileAlignment>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <FileAlignment>8192</FileAlignment>
   </PropertyGroup>
 
   <ItemGroup>

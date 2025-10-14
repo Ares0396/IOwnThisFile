@@ -19,6 +19,7 @@ namespace Main.Support_Tools
         public int SmartWriteSelector_Threshold { get; set; } = 10; //default is 10 files
         public bool SmartWriteSelector_AllOutMode { get; set; } = false; //default is false (normal mode)
         public string App_SettingSaveMode_FilePath { get; set; } = string.Empty; //default is empty, user can set path to save settings file
+        public int OptimizeSpeedOrRes { get; set; } = 0; //Optimized for best performance
 
         // Saving and loading settings
         public static void SaveSettingsFile(AppSetting settings, string filePath)
@@ -80,6 +81,7 @@ namespace Main.Support_Tools
             key.SetValue(Config.Reg_SmartWriteSelectorThreshold, 10, RegistryValueKind.DWord);
             key.SetValue(Config.Reg_SettingSaveMode, "Registry", RegistryValueKind.String);
             key.SetValue(Config.Reg_AppSetting_FilePath, string.Empty, RegistryValueKind.String);
+            key.SetValue(Config.Reg_OptimizeSpeedOrRes, 0, RegistryValueKind.DWord);
         }
 
         public static AppSetting GetDefaultAppSettings() => new()
@@ -91,7 +93,8 @@ namespace Main.Support_Tools
             SmartWriteSelector_Threshold = 10,
             SmartWriteSelector_AllOutMode = false,
             App_SettingSaveMode = InternalSettingSaveMode.Registry,
-            App_SettingSaveMode_FilePath = string.Empty
+            App_SettingSaveMode_FilePath = string.Empty,
+            OptimizeSpeedOrRes = 0
         };
 
         public static AppSetting LoadSettingsRegistry()
@@ -108,7 +111,8 @@ namespace Main.Support_Tools
                 SmartWriteSelector_AllOutMode = Convert.ToBoolean(key.GetValue(Config.Reg_SmartWriteSelectorAllOutMode) ?? false),
                 App_SettingSaveMode = ((string)(key.GetValue(Config.Reg_SettingSaveMode) ?? "Registry")) == "File"
                     ? InternalSettingSaveMode.File : InternalSettingSaveMode.Registry,
-                App_SettingSaveMode_FilePath = (string)(key.GetValue(Config.Reg_AppSetting_FilePath) ?? string.Empty)
+                App_SettingSaveMode_FilePath = (string)(key.GetValue(Config.Reg_AppSetting_FilePath) ?? string.Empty),
+                OptimizeSpeedOrRes = (int)(key.GetValue(Config.Reg_OptimizeSpeedOrRes) ?? 0)
             };
         }
 
@@ -123,6 +127,7 @@ namespace Main.Support_Tools
             key.SetValue(Config.Reg_SmartWriteSelectorAllOutMode, settings.SmartWriteSelector_AllOutMode ? 1 : 0, RegistryValueKind.DWord);
             key.SetValue(Config.Reg_SettingSaveMode, settings.App_SettingSaveMode == InternalSettingSaveMode.File ? "File" : "Registry", RegistryValueKind.String);
             key.SetValue(Config.Reg_AppSetting_FilePath, settings.App_SettingSaveMode_FilePath ?? string.Empty, RegistryValueKind.String);
+            key.SetValue(Config.Reg_OptimizeSpeedOrRes, settings.OptimizeSpeedOrRes, RegistryValueKind.DWord);
         }
 
         public static void SaveSettings(AppSetting settings)

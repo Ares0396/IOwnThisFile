@@ -1,7 +1,8 @@
+using Main;
 using Main.Support_Tools;
 using System.Security.Cryptography;
 
-namespace Main.Forms
+namespace AIO.Forms
 {
     internal static class Program
     {
@@ -18,6 +19,13 @@ namespace Main.Forms
                 MessageBox.Show("A fatal error occurred. Click \"Ok\" to close the program.", "Fatal error occurred.", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Environment.Exit(1);
             });
+
+            if (!OperatingSystem.IsWindows())
+            {
+                //The user's OS is unlikely Windows
+                var result = MessageBox.Show("This software is designed for Windows only. Are you sure you want to continue? Features may not work correctly.", "Incompatibility detected!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                if (result == DialogResult.No) Environment.Exit(1);
+            }
 
             //Handle startup commands
             if (args.Length > 0)

@@ -47,11 +47,11 @@ namespace Main
             //Process file
             if (appSetting.SmartWriteSelector_AllOutMode)
             {
-                await CryptographicOperation.ProcessFilesAsync(selectedFiles, Config.Password, Config.CryptoMode, generalProgress, fileProgress);
+                await CryptographicOperation.ProcessFilesAsync(selectedFiles, Config.Password, Config.CryptoMode, generalProgress, fileProgress, appSetting.OptimizeSpeedOrRes == 1); //1 means resource => reuse
             }
             else
             {
-                await CryptographicOperation.ProcessFilesAsync(selectedFiles, Config.Password, appSetting.SmartWriteSelector_Threshold, Config.CryptoMode, generalProgress, fileProgress);
+                await CryptographicOperation.ProcessFilesAsync(selectedFiles, Config.Password, appSetting.SmartWriteSelector_Threshold, Config.CryptoMode, generalProgress, fileProgress, appSetting.OptimizeSpeedOrRes == 1);
             }
 
             // Final UI update

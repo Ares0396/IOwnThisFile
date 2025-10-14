@@ -110,6 +110,18 @@ namespace Main
                         Close();
                     }
                 }
+                catch (HttpRequestException)
+                {
+                    //Connection likely failed, so don't throw.
+                    Lb_UpdateStatus.Text = "Failed to check for update. Starting app...";
+                    Lb_UpdateStatus.Location = new Point(20, 54);
+                    await Task.Delay(1000);
+
+                    //Start app
+                    Hide();
+                    NewForm.ShowDialog();
+                    Close();
+                }
                 catch (Exception ex)
                 {
                     Support_Tools.Debugger.Handle(ex, async() =>
@@ -141,7 +153,7 @@ namespace Main
 
                 Progress<double> copyProgress = new(p =>
                 {
-                    Lb_UpdateProgress.Text = $"Update Status: Copying new file... {p:P2}";
+                    Lb_UpdateProgress.Text = $"Update Status: Copying new file... ({p:P2})";
                 }); //Prepare a progress instance for reporting
 
                 using (FileStream fsSrc = new(Application.ExecutablePath, FileMode.Open, FileAccess.Read))
@@ -191,10 +203,6 @@ namespace Main
             Progress<double> downloadProgress = new(p =>
             {
                 Lb_UpdateProgress.Text = $"Update Status: Downloading... ({p:P2})";
-            });
-            Progress<double> overwriteProgress = new(p =>
-            {
-                Lb_UpdateProgress.Text = $"Update Status: Copying new file... ({p:P2})";
             });
 
             //Download process starts here
@@ -289,9 +297,6 @@ namespace Main
 
         private async void Btn_UpdateCancel_Click(object sender, EventArgs e)
         {
-            Pn_UpdateFound.Visible = false;
-            Pn_UpdateCheck.Visible = true;
-
             Lb_UpdateProgress.Text = "Update Status: Update cancelled by user. Starting app...";
             await Task.Delay(1000);
 

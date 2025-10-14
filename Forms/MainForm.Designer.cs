@@ -78,6 +78,8 @@ namespace Main
             ToolTip_Btn_ViewProperties = new ToolTip(components);
             Dlg_OpenFiles_Setting = new OpenFileDialog();
             Dlg_SaveFiles_Setting = new SaveFileDialog();
+            label9 = new Label();
+            CbBox_Optimize = new ComboBox();
             Tab_Decryption.SuspendLayout();
             Tab_Encryption.SuspendLayout();
             Main_TabControl.SuspendLayout();
@@ -416,6 +418,8 @@ namespace Main
             // Pn_SettingPreference
             // 
             Pn_SettingPreference.AutoScroll = true;
+            Pn_SettingPreference.Controls.Add(CbBox_Optimize);
+            Pn_SettingPreference.Controls.Add(label9);
             Pn_SettingPreference.Controls.Add(ChkBox_AllOutWriteMode);
             Pn_SettingPreference.Controls.Add(NumUpDown_NumParallelProcessing);
             Pn_SettingPreference.Controls.Add(label8);
@@ -628,6 +632,28 @@ namespace Main
             Dlg_SaveFiles_Setting.Filter = "JSON file|*.json";
             Dlg_SaveFiles_Setting.Title = "Save settings to a file";
             // 
+            // label9
+            // 
+            label9.AutoSize = true;
+            label9.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label9.Location = new Point(36, 360);
+            label9.Name = "label9";
+            label9.Size = new Size(80, 21);
+            label9.TabIndex = 34;
+            label9.Text = "Optimize: ";
+            // 
+            // CbBox_Optimize
+            // 
+            CbBox_Optimize.DropDownStyle = ComboBoxStyle.DropDownList;
+            CbBox_Optimize.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            CbBox_Optimize.FormattingEnabled = true;
+            CbBox_Optimize.Items.AddRange(new object[] { "Performance (best speed)", "Resources (lowest usage)" });
+            CbBox_Optimize.Location = new Point(122, 357);
+            CbBox_Optimize.Name = "CbBox_Optimize";
+            CbBox_Optimize.Size = new Size(210, 29);
+            CbBox_Optimize.TabIndex = 35;
+            CbBox_Optimize.SelectedIndexChanged += CbBox_Optimize_SelectedIndexChanged;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -705,6 +731,8 @@ namespace Main
         private CheckBox ChkBox_SettingReg;
         private Label label3;
         private SaveFileDialog Dlg_SaveFiles_Setting;
+        private ComboBox CbBox_Optimize;
+        private Label label9;
     }
 }
 

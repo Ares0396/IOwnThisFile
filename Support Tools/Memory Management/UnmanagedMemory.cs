@@ -70,5 +70,9 @@ namespace Main.Support_Tools.Memory_Management
             if (_disposed || _buffer == null)
                 throw new ObjectDisposedException(nameof(UnmanagedMemory<T>), "Cannot use after disposal.");
         }
+        public void Dispose()
+        {
+            Dispose(true);
+        }
     }
 }

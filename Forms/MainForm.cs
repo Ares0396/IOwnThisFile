@@ -5,7 +5,7 @@ namespace Main
 {
     public partial class MainForm : Form
     {
-        private AppSetting appSetting;
+        private readonly AppSetting appSetting;
         private bool formBeingInitialized = true; //Default
         public MainForm(AppSetting appSetting)
         {
@@ -14,7 +14,7 @@ namespace Main
 
             //Update title
             Version currentVer = Assembly.GetExecutingAssembly().GetName().Version!;
-            this.Text = $"IOwnThisFile v{currentVer.Major}.{currentVer.Minor}.{currentVer.Build}";
+            Text = $"IOwnThisFile v{currentVer.Major}.{currentVer.Minor}.{currentVer.Build}";
 
             //Apply settings from appSetting to the UI elements
             ApplySettings(appSetting);
@@ -23,50 +23,32 @@ namespace Main
         private async void Btn_AddFiles_Enc_Click(object sender, EventArgs e)
         {
             int InitialCount = Box_SelectedFiles_Enc.Items.Count;
+
             Dlg_OpenFiles.ShowDialog();
             string[] SelectedFiles = Dlg_OpenFiles.FileNames;
-            await Task.Run(() =>
-            {
-                foreach (string file in SelectedFiles)
-                {
-                    Invoke(new Action(() =>
-                    {
-                        Box_SelectedFiles_Enc.Items.Add(file);
-                    }));
-                }
-            });
+
+            Box_SelectedFiles_Enc.Items.AddRange(SelectedFiles);
             int Count = Box_SelectedFiles_Enc.Items.Count;
-            await Task.Run(async () =>
+
+            for (int i = InitialCount; i <= Count; i++)
             {
-                for (int i = InitialCount; i <= Count; i++)
+                Invoke(new Action(() =>
                 {
-                    Invoke(new Action(() =>
-                    {
-                        Lb_FileNum_Enc.Text = "Number of Files Ready: " + i.ToString();
-                    }));
-                    await Task.Delay(1); // Simulate some delay for UI update
-                }
-            });
+                    Lb_FileNum_Enc.Text = "Number of Files Ready: " + i.ToString();
+                }));
+                await Task.Delay(1); // Simulate some delay for UI update
+            }
         }
 
         private async void Btn_ClearFiles_Enc_Click(object sender, EventArgs e)
         {
-            await Task.Run(() =>
+            int InitialCount = Box_SelectedFiles_Enc.Items.Count;
+            Box_SelectedFiles_Enc.Items.Clear();
+            for (int i = InitialCount; i >= 0; i--)
             {
-                int InitialCount = Box_SelectedFiles_Enc.Items.Count;
-                Invoke(new Action(() =>
-                {
-                    Box_SelectedFiles_Enc.Items.Clear();
-                }));
-                for (int i = InitialCount; i >= 0; i--)
-                {
-                    Invoke(new Action(() =>
-                    {
-                        Lb_FileNum_Enc.Text = "Number of Files Ready: " + i.ToString();
-                    }));
-                    Thread.Sleep(1); // Simulate some delay for UI update
-                }
-            });
+                Lb_FileNum_Enc.Text = "Number of Files Ready: " + i.ToString();
+                await Task.Delay(1);
+            }
         }
 
         private void ChkBox_IOLock_CheckedChanged(object sender, EventArgs e)
@@ -91,11 +73,7 @@ namespace Main
             await Task.Run(() =>
             {
                 //Get the selected files from the list box
-                List<string> SelectedFiles = [];
-                foreach (var item in Box_SelectedFiles_Enc.Items)
-                {
-                    SelectedFiles.Add(item.ToString());
-                }
+                List<string> SelectedFiles = [.. Box_SelectedFiles_Enc.Items.Cast<string>()];
 
                 //Encryption logic goes here
                 Config.SelectedFiles = SelectedFiles;
@@ -187,48 +165,24 @@ namespace Main
             int InitialCount = Box_SelectedFiles_Dec.Items.Count;
             Dlg_OpenFiles.ShowDialog();
             string[] SelectedFiles = Dlg_OpenFiles.FileNames;
-            await Task.Run(() =>
-            {
-                foreach (string file in SelectedFiles)
-                {
-                    Invoke(new Action(() =>
-                    {
-                        Box_SelectedFiles_Dec.Items.Add(file);
-                    }));
-                }
-            });
+            Box_SelectedFiles_Dec.Items.AddRange(SelectedFiles);
             int Count = Box_SelectedFiles_Dec.Items.Count;
-            await Task.Run(async () =>
+            for (int i = InitialCount; i <= Count; i++)
             {
-                for (int i = InitialCount; i <= Count; i++)
-                {
-                    Invoke(new Action(() =>
-                    {
-                        Lb_FileNum_Dec.Text = "Number of Files Ready: " + i.ToString();
-                    }));
-                    await Task.Delay(1); // Simulate some delay for UI update
-                }
-            });
+                Lb_FileNum_Dec.Text = "Number of Files Ready: " + i.ToString();
+                await Task.Delay(1); // Simulate some delay for UI update
+            }
         }
 
         private async void Btn_Clear_Dec_Click(object sender, EventArgs e)
         {
-            await Task.Run(async () =>
+            int InitialCount = Box_SelectedFiles_Dec.Items.Count;
+            Box_SelectedFiles_Dec.Items.Clear();
+            for (int i = InitialCount; i >= 0; i--)
             {
-                int InitialCount = Box_SelectedFiles_Dec.Items.Count;
-                Invoke(new Action(() =>
-                {
-                    Box_SelectedFiles_Dec.Items.Clear();
-                }));
-                for (int i = InitialCount; i >= 0; i--)
-                {
-                    Invoke(new Action(() =>
-                    {
-                        Lb_FileNum_Dec.Text = "Number of Files Ready: " + i.ToString();
-                    }));
-                    await Task.Delay(1); // Simulate some delay for UI update
-                }
-            });
+                Lb_FileNum_Dec.Text = "Number of Files Ready: " + i.ToString();
+                await Task.Delay(1); // Simulate some delay for UI update
+            }
         }
 
         private async void Btn_Decrypt_Click(object sender, EventArgs e)
@@ -242,11 +196,7 @@ namespace Main
             {
 
                 //get the selected files from the list box
-                List<string> SelectedFiles = [];
-                foreach (var item in Box_SelectedFiles_Dec.Items)
-                {
-                    SelectedFiles.Add(item.ToString());
-                }
+                List<string> SelectedFiles = [.. Box_SelectedFiles_Dec.Items.Cast<string>()];
 
                 //Unlock relevant lock streams and delete related entries from the File Management tab
                 foreach (string file in SelectedFiles)
@@ -297,14 +247,31 @@ namespace Main
         {
             if (e.Index < 0) return;
 
+            // Get the item text
             string itemText = EncFile_List.Items[e.Index].ToString()!;
-            Color textColor = itemText.Contains("(IO-Locked)") ? Color.Green : Color.Black;
 
+            // Define your background theme flag
+            bool IsLightBackground = appSetting.App_Theme == AppSetting.InternalTheme.Light; // or get this value from elsewhere
+
+            // Base text color depending on whether the background is light or dark
+            Color defaultTextColor = IsLightBackground ? Color.Black : Color.White;
+
+            // Special case for "(IO-Locked)" items
+            Color lockedTextColor = IsLightBackground ? Color.DarkGreen : Color.LightGreen;
+
+            // Choose text color based on the item
+            Color textColor = itemText.Contains("(IO-Locked)") ? lockedTextColor : defaultTextColor;
+
+            // Draw the background
             e.DrawBackground();
+
+            // Draw the text
             using (Brush brush = new SolidBrush(textColor))
             {
                 e.Graphics.DrawString(itemText, e.Font, brush, e.Bounds);
             }
+
+            // Draw focus rectangle if needed
             e.DrawFocusRectangle();
         }
 
@@ -851,10 +818,28 @@ namespace Main
             {
                 ChkBox_AllOutWriteMode.Checked = false;
             }
+
+            //Cb_Optimize
+            CbBox_Optimize.SelectedIndex = appSetting.OptimizeSpeedOrRes;
+
+            SetLb_SaveSettingStatus(true);
+            Config.SettingsChanged = false;
         }
         private void SetTheme(AppSetting.InternalTheme theme)
         {
             AppSetting.SetTheme(this, theme);
+            if (appSetting.App_Theme == AppSetting.InternalTheme.Light)
+            {
+                this.BackColor = Config.Color_LightBackground;
+                EncFile_List.BackColor = Config.Color_LightControlBackground;
+                EncFile_List.ForeColor = Config.Color_LightTextColor;
+            }
+            else
+            {
+                this.BackColor = Config.Color_Background;
+                EncFile_List.BackColor = Config.Color_ControlBackground;
+                EncFile_List.ForeColor = Config.Color_TextColor;
+            }
         }
         private void SetLb_SaveSettingStatus(bool settingSaved)
         {
@@ -882,6 +867,13 @@ namespace Main
         private void NumUpDown_UpdateAttemptCount_ValueChanged(object sender, EventArgs e)
         {
             appSetting.UpdateChecker_RetryMaxCount = (int)NumUpDown_UpdateAttemptCount.Value;
+            SetLb_SaveSettingStatus(false);
+            Config.SettingsChanged = true;
+        }
+
+        private void CbBox_Optimize_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            appSetting.OptimizeSpeedOrRes = CbBox_Optimize.SelectedIndex;
             SetLb_SaveSettingStatus(false);
             Config.SettingsChanged = true;
         }

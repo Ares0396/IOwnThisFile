@@ -66,3 +66,6 @@ v1.3.0:
    + Small fixes to make the UI more responsive.
    + New cryptographic developments are still underway.
 - Known bug (INTENTIONAL): Encrypted files grow to match the same size as the largest one in a selected group when users opt to save resources.
+v1.3.1:
+- Easter Egg is gone: The same-size issue is fixed.
+- Additional note: This version is expected to be the last one before a major update. Stay tuned!

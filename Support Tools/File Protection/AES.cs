@@ -109,7 +109,7 @@ namespace Main.Support_Tools
                 byte[] headerBytes = Encoding.UTF8.GetBytes(Config.AAD_Header);
 
                 using FileStream fs = new(file, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
-                Memory<byte> data = mem.Memory;
+                Memory<byte> Originaldata = mem.Memory;
 
                 //Check if the memory size is big enough to contain the encrypted data
                 //We'll compute the output based on the size of each structural section
@@ -118,16 +118,22 @@ namespace Main.Support_Tools
                                          + Config.SaltCount         //Salt
                                          + fileSize                 //Original data
                                          + Config.TagSize;          //Tag
+
+                //Why not compare with fileSize? Because we need to make it compatible with the decryption logic.
+                //If the file size is < int.MaxValue, but then the whole new data is > int.MaxSize, then oopsie! "Your file has been encrypted!"
                 if (estimatedOutputSize > int.MaxValue)
                 {
                     //Detected the issue of size being too large - Abort and throw
                     throw new InvalidOperationException("Operation does not support files larger than ~2GB");
                 }
-                if (data.Length < estimatedOutputSize)
+                if (Originaldata.Length < estimatedOutputSize)
                 {
                     //Memory size is lower than actual estimated output! Resize it!
                     mem.Resize((int)estimatedOutputSize); //No support for arrays of long-type size, so let it throw. Users can handle that.
                 }
+
+                Originaldata = mem.Memory; //Reassign, as the old one is invalidated
+                Memory<byte> data = Originaldata.Slice(0, (int)fileSize);
 
                 // Read file into rented buffer
                 int bytesRead = 0;

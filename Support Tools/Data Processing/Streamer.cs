@@ -1,4 +1,5 @@
 ﻿using System.Buffers;
+using System.Security.Cryptography;
 
 namespace Main.Support_Tools
 {
@@ -6,12 +7,17 @@ namespace Main.Support_Tools
     {
         public static async Task WriteDownloadedDataAsync(string URL, Stream stream, IProgress<double> progress, int chunkSize = 65536, HttpClient client = null, int retryMax = 1, CancellationToken token = default)
         {
+            await WriteAndVerifyDownloadedDataAsync(URL, stream, progress, chunkSize, client, retryMax, null, token); // = no hashing
+        }
+        public static async Task<bool> WriteAndVerifyDownloadedDataAsync(string URL, Stream stream, IProgress<double> progress, int chunkSize = 65536, HttpClient client = null, int retryMax = 1, string expectedHash = null, CancellationToken token = default)
+        {
             ArrayPool<byte> Pool = ArrayPool<byte>.Shared; //Define pooling provider
             byte[] chunkBuffer = null; //Silence the compiler error
             bool bufferRented = false;
             bool success = false;
             int attemptCount = 0;
             bool DisposeClient = false;
+            string generatedHash;
 
             //Determine if HttpClient is passed or not
             if (client == null)
@@ -48,6 +54,7 @@ namespace Main.Support_Tools
                     }
 
                     using (HttpResponseMessage responseMsg = await client.GetAsync(URL, HttpCompletionOption.ResponseHeadersRead, token))
+                    using (IncrementalHash hasher = IncrementalHash.CreateHash(Config.RFC_Algorithm))
                     using (Stream remoteStream = responseMsg.Content.ReadAsStream(token))
                     {
                         long? totalBytes = responseMsg.Content.Headers.ContentLength;
@@ -57,6 +64,7 @@ namespace Main.Support_Tools
                         while ((bytesRead = await remoteStream.ReadAsync(chunkBuffer.AsMemory(0, chunkBuffer.Length), token)) > 0)
                         {
                             await stream.WriteAsync(chunkBuffer.AsMemory(0, bytesRead), token); //Write
+                            hasher.AppendData(chunkBuffer, 0, bytesRead); //bytesRead, not chunkBuffer.Length, because we could accidentally read zeroes
 
                             bytesReadSoFar += bytesRead;
 
@@ -65,19 +73,28 @@ namespace Main.Support_Tools
                                 progress?.Report((double)bytesReadSoFar / totalBytes.Value); //Report
                             }
                         }
+                        generatedHash = CryptographicOperation.FormatHash(hasher.GetHashAndReset());
                     }
 
-                    success = true; //Mark if the operation is successful
+                    if (expectedHash is null || generatedHash == expectedHash)
+                    {
+                        success = true; //Mark if the operation is successful
+                    }
+                    else success = false;
                 }
+
+                return success;
             }
             catch (Exception ex) when (attemptCount == retryMax)
             {
                 success = false; //Mark if the operation is unsuccessful
                 Debugger.Handle(ex);
+                return success;
             }
             catch
             {
                 success = false; //Mark if the operation is unsuccessful
+                return success;
             }
             finally //Clean up
             {

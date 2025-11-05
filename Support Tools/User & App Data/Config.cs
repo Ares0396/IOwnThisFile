@@ -9,7 +9,7 @@ namespace Main.Support_Tools
         public static Dictionary<string, FileStream> LockStream_Dictionary { get; set; } = []; //LockStream dictionary
 
         //Cryptography config for AES-GCM
-        public static readonly string AAD_Header = "IOTF v1.0";
+        public static readonly string AAD_Header = "IOTF v2.0";
         public static readonly int TagSize = 16;
         public static readonly int Iteration = 500000;
         public static readonly HashAlgorithmName RFC_Algorithm = HashAlgorithmName.SHA256;

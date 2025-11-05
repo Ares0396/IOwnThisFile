@@ -1,4 +1,4 @@
-# IOwnThisFile
+# IOwnThisFile (DISCONTINUED)
 
 A lightweight Windows application for protecting files with **AES-GCM encryption** and an **IO-Lock** mechanism.  
 Self-contained: just download, run, and protect your files.

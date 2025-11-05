@@ -6,6 +6,16 @@ namespace Main.Support_Tools
 {
     public static class CryptographicOperation
     {
+        public enum CryptographicMode : int
+        {
+            AES_GCM,
+            AES_CTR,
+            AES_CBC,
+            AES_CFB,
+            AES_CTS,
+            AES_ECB
+        }
+
         //File processing with custom settings
         public static async Task ProcessFilesAsync(List<string> files, string password, int maxParallelTasks, Config.CryptographyMode mode, IProgress<(string file, bool success)> generalProgress, IProgress<string> fileProgress, bool reuse)
         {
@@ -145,7 +155,7 @@ namespace Main.Support_Tools
             }
             return hash;
         }
-        private static string FormatHash(byte[] hash)
+        public static string FormatHash(byte[] hash)
         {
             if (hash == null || hash == Array.Empty<byte>())
             {

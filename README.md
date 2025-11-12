@@ -65,9 +65,9 @@ Self-contained: just download, run, and protect your files.
 
 ## 🛠 Development Notes
 
-- I, as the author of this project, may have to discontinue this project due to academic pressure.
-- For the time being, however, I'll try my best to update and maintain this project.
-- Good day to you! Written by a Vietnamese 9th grader, tested by a British friend.
+- Well, if you see this message, then it's come true: This project is officially discontinued.
+- But it doesn't mean the end of the world. Source code is there, and I'm just taking a break until I'm ready to jump back to work again.
+- Feel free to fork the repository and continue development on your own.
 
 ---
 
